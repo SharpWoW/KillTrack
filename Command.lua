@@ -44,6 +44,13 @@ function C:Register(command, func)
 	end
 end
 
+function C:HasCommand(command)
+	for k,_ in pairs(self.Commands) do
+		if k == command then return true end
+	end
+	return false
+end
+
 function C:GetCommand(command)
 	local cmd = self.Commands[command]
 	if cmd then return cmd else return self.Commands["__DEFAULT__"] end
@@ -59,10 +66,10 @@ function C:HandleCommand(command, args)
 end
 
 C:Register("__DEFAULT__", function(args)
-	KT:Msg(("%q is not a valid command."):format(tostring(msg)))
 	KT:Msg("/kt target - Display number of kills on target mob.")
-	KT:Msg("/kt <name> - Display number of kills on <name>, <name> can also be NPC ID.")
+	KT:Msg("/kt lookup <name> - Display number of kills on <name>, <name> can also be NPC ID.")
 	KT:Msg("/kt print - Toggle printing kill updates to chat.")
+	KT:Msg("/kt purge [treshold] - Open dialog to purge entries, specifiying a treshold here is optional.")
 	KT:Msg("/kt reset - Clear the mob database.")
 	KT:Msg("/kt - Displays this help message.")
 end)
