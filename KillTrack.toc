@@ -6,5 +6,7 @@
 ## SavedVariables: KILLTRACK
 ## SavedVariablesPerCharacter: KILLTRACK_CHAR
 
+Tools.lua
 KillTrack.lua
 Dialogs.lua
+Command.lua

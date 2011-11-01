@@ -18,6 +18,8 @@
 --]]
 
 KillTrack = {
+	Name = "KillTrack",
+	Version = GetAddOnMetadata("KillTrack", "Version"),
 	Events = {},
 	Global = {},
 	CharGlobal = {}
@@ -25,9 +27,7 @@ KillTrack = {
 
 local KT = KillTrack
 
-local function GUIDToID(guid)
-	return tonumber(guid:sub(-12, -9), 16)
-end
+local KTT = KillTrack_Tools
 
 function KT:OnEvent(_, event, ...)
 	if self.Events[event] then
@@ -61,7 +61,7 @@ end
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local event = (select(2, ...))
 	if event ~= "PARTY_KILL" then return end
-	local id = GUIDToID((select(8, ...)))
+	local id = KTT:GUIDToID((select(8, ...)))
 	local name = tostring((select(9, ...)))
 	if id == 0 then return end
 	self:AddKill(id, name)
@@ -70,7 +70,7 @@ end
 function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 	if UnitIsPlayer("mouseover") then return end
 	if not UnitCanAttack("player", "mouseover") then return end
-	local id = GUIDToID(UnitGUID("mouseover"))
+	local id = KTT:GUIDToID(UnitGUID("mouseover"))
 	local gKills, cKills = self:GetKills(id)
 	GameTooltip:AddLine(("Killed %d (%d) times."):format(gKills, cKills), 1, 1, 1)
 	GameTooltip:Show()
@@ -131,36 +131,6 @@ end
 
 function KT:Msg(msg)
 	DEFAULT_CHAT_FRAME:AddMessage("\124cff00FF00[KillTrack]\124r " .. msg)
-end
-
-SLASH_KILLTRACK1 = "/killtrack"
-SLASH_KILLTRACK2 = "/kt"
-
-SlashCmdList["KILLTRACK"] = function(msg, editBox)
-	if msg == "target" and UnitExists("target") and not UnitIsPlayer("target") then
-		local id = tonumber(UnitGUID("target"):sub(-12, -9), 16)
-		KT:PrintKills(id)
-	elseif msg == "print" then
-		KT.Global.PRINTKILLS = not KT.Global.PRINTKILLS
-		if KT.Global.PRINTKILLS then
-			KT:Msg("Announcing kill updates.")
-		else
-			KT:Msg("No longer announcing kill updates.")
-		end
-	elseif msg == "purge" then
-		KT:Msg("NYI")
-	elseif msg == "reset" then
-		KT:Reset()
-	elseif msg and msg ~= "" then
-		KT:PrintKills(msg)
-	else
-		KT:Msg(("%q is not a valid command."):format(tostring(msg)))
-		KT:Msg("/kt target - Display number of kills on target mob.")
-		KT:Msg("/kt <name> - Display number of kills on <name>, <name> can also be NPC ID.")
-		KT:Msg("/kt print - Toggle printing kill updates to chat.")
-		KT:Msg("/kt reset - Clear the mob database.")
-		KT:Msg("/kt - Displays this help message.")
-	end
 end
 
 KT.Frame = CreateFrame("Frame")

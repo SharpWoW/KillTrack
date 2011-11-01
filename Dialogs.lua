@@ -19,6 +19,8 @@
 
 local KT = KillTrack
 
+local Treshold
+
 local function Purge(treshold)
 	local count = 0
 	for i,v in ipairs(KT.Global.MOBS) do
@@ -34,6 +36,7 @@ local function Purge(treshold)
 		end
 	end
 	KT:Msg(("Purged %d entries with a kill count below %d"):format(count, treshold))
+	Treshold = nil
 	StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
 end
 
@@ -60,7 +63,14 @@ StaticPopupDialogs["KILLTRACK_PURGE"] = {
 	button2 = "Cancel",
 	hasEditBox = true,
 	OnAccept = function(self, data, data2) Purge(tonumber(self.editBox:GetText())) end,
-	OnShow = function(self, data) self.button1:Disable() end,
+	OnCancel = function() Treshold = nil end,
+	OnShow = function(self, data)
+		if tonumber(Treshold) then
+			self.editBox:SetText(tostring(Treshold))
+		else
+			self.button1:Disable()
+		end
+	end,
 	EditBoxOnTextChanged = function(self, data)
 		if tonumber(self:GetText()) then
 			self:GetParent().button1:Enable()
@@ -87,7 +97,10 @@ StaticPopupDialogs["KILLTRACK_RESET"] = {
 	hideOnEscape = true
 }
 
-function KT:Purge()
+function KT:Purge(treshold)
+	if tonumber(treshold) then
+		Treshold = tonumber(treshold)
+	end
 	StaticPopup_Show("KILLTRACK_PURGE")
 end
 
