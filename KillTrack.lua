@@ -125,6 +125,9 @@ function KT:PrintKills(identifier)
 	if found then
 		self:Msg(("You have killed %q %d times in total, %d times on this character"):format(name, gKills, cKills))
 	else
+		if UnitExists("target") and not UnitIsPlayer("target") then
+			identifier = UnitName("target")
+		end
 		self:Msg(("Unable to find %q in mob database."):format(tostring(identifier)))
 	end
 end

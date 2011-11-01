@@ -19,7 +19,7 @@
 
 KillTrack_Tools = {}
 
-local KTT = KillTrack_StringTools
+local KTT = KillTrack_Tools
 
 ------------------
 -- STRING TOOLS --
@@ -46,6 +46,43 @@ function KTT:InTable(tbl, val)
 		if v == val then return true end
 	end
 	return false
+end
+
+function KTT:TableCopy(tbl, cache)
+	if type(tbl) ~= "table" then return tbl end
+	cache = cache or {}
+	if cache[tbl] then return cache[tbl] end
+	local copy = {}
+	cache[tbl] = copy
+	for k, v in pairs(tbl) do
+		copy[self:TableCopy(k, cache)] = self:TableCopy(v, cache)
+	end
+	return copy
+end
+
+KTT.SortMode = {
+	Descending = 0,
+	Ascending = 1
+}
+
+function KTT:GetSortedMobTable(tbl, mode)
+	local t = {}
+	for k,v in pairs(tbl) do
+		local entry = {Id = k, Name = v.Name, Kills = v.Kills}
+		table.insert(t, entry)
+	end
+	if not mode or (mode < 0 or mode > 1) then
+		mode = self.SortMode.Descending
+	end
+	local function compare(a, b)
+		if mode == self.SortMode.Descending then
+			return a.Kills > b.Kills
+		else
+			return a.Kills < b.Kills
+		end
+	end
+	table.sort(t, compare)
+	return t
 end
 
 -----------------
