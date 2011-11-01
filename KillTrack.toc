@@ -1,0 +1,9 @@
+## Interface: 40200
+## Version: v1
+## Title: KillTrack
+## Notes: Tracks kills.
+## Author: F16Gaming
+## SavedVariables: KILLTRACK
+## SavedVariablesPerCharacter: KILLTRACK_CHAR
+
+KillTrack.lua
