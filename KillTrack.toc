@@ -7,3 +7,4 @@
 ## SavedVariablesPerCharacter: KILLTRACK_CHAR
 
 KillTrack.lua
+Dialogs.lua
