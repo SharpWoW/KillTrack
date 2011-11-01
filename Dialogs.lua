@@ -41,7 +41,7 @@ local function Reset()
 	local count = #KT.Global.MOBS + #KT.CharGlobal.MOBS
 	wipe(KT.Global.MOBS)
 	wipe(KT.CharGlobal.MOBS)
-	KT:Msg("Mob entries have been removed!")
+	KT:Msg(("%d mob entries have been removed!"):format(count))
 	StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
 end
 

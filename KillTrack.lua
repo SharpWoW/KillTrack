@@ -158,6 +158,7 @@ SlashCmdList["KILLTRACK"] = function(msg, editBox)
 		KT:Msg("/kt target - Display number of kills on target mob.")
 		KT:Msg("/kt <name> - Display number of kills on <name>, <name> can also be NPC ID.")
 		KT:Msg("/kt print - Toggle printing kill updates to chat.")
+		KT:Msg("/kt reset - Clear the mob database.")
 		KT:Msg("/kt - Displays this help message.")
 	end
 end
