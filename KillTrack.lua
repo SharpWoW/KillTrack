@@ -152,7 +152,9 @@ function KT:GetSortedMobTable(mode)
 	local t = {}
 	for k,v in pairs(self.Global.MOBS) do
 		local cKills = 0
-		if self.CharGlobal.MOBS[k] and type(v) == "table" then cKills = self.CharGlobal.MOBS[k].Kills end
+		if self.CharGlobal.MOBS[k] and type(self.CharGlobal.MOBS[k]) == "table" then
+			cKills = self.CharGlobal.MOBS[k].Kills
+		end
 		if type(v) == "table" then
 			local entry = {Id = k, Name = v.Name, gKills = v.Kills, cKills = cKills}
 			table.insert(t, entry)
