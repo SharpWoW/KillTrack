@@ -23,15 +23,15 @@ local Treshold
 
 local function Purge(treshold)
 	local count = 0
-	for i,v in ipairs(KT.Global.MOBS) do
-		if v.Kills < treshold then
-			table.remove(KT.Global.MOBS, i)
+	for k,v in pairs(KT.Global.MOBS) do
+		if type(v) == "table" and v.Kills < treshold then
+			KT.Global.MOBS[k] = nil
 			count = count + 1
 		end
 	end
-	for i,v in pairs(KT.CharGlobal.MOBS) do
-		if v.Kills < treshold then
-			table.remove(KT.CharGlobal.MOBS, i)
+	for k,v in pairs(KT.CharGlobal.MOBS) do
+		if type(v) == "table" and v.Kills < treshold then
+			KT.CharGlobal.MOBS[k] = nil
 			count = count + 1
 		end
 	end

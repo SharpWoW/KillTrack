@@ -10,3 +10,5 @@ Tools.lua
 KillTrack.lua
 Dialogs.lua
 Command.lua
+MobList.lua
+#MobList.xml

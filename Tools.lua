@@ -60,31 +60,6 @@ function KTT:TableCopy(tbl, cache)
 	return copy
 end
 
-KTT.SortMode = {
-	Descending = 0,
-	Ascending = 1
-}
-
-function KTT:GetSortedMobTable(tbl, mode)
-	local t = {}
-	for k,v in pairs(tbl) do
-		local entry = {Id = k, Name = v.Name, Kills = v.Kills}
-		table.insert(t, entry)
-	end
-	if not mode or (mode < 0 or mode > 1) then
-		mode = self.SortMode.Descending
-	end
-	local function compare(a, b)
-		if mode == self.SortMode.Descending then
-			return a.Kills > b.Kills
-		else
-			return a.Kills < b.Kills
-		end
-	end
-	table.sort(t, compare)
-	return t
-end
-
 -----------------
 -- OTHER TOOLS --
 -----------------

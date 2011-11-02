@@ -69,6 +69,7 @@ C:Register("__DEFAULT__", function(args)
 	KT:Msg("/kt target - Display number of kills on target mob.")
 	KT:Msg("/kt lookup <name> - Display number of kills on <name>, <name> can also be NPC ID.")
 	KT:Msg("/kt print - Toggle printing kill updates to chat.")
+	KT:Msg("/kt list - Display a list of all mobs entries.")
 	KT:Msg("/kt purge [treshold] - Open dialog to purge entries, specifiying a treshold here is optional.")
 	KT:Msg("/kt reset - Clear the mob database.")
 	KT:Msg("/kt - Displays this help message.")
@@ -106,6 +107,10 @@ C:Register({"lookup", "lo", "check"}, function(args)
 	end
 	local name = table.concat(args, " ")
 	KT:PrintKills(name)
+end)
+
+C:Register({"list", "moblist", "mobs"}, function(args)
+	KT.MobList:ShowGUI()
 end)
 
 for i,v in ipairs(C.Slash) do

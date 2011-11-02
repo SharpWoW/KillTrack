@@ -22,7 +22,17 @@ KillTrack = {
 	Version = GetAddOnMetadata("KillTrack", "Version"),
 	Events = {},
 	Global = {},
-	CharGlobal = {}
+	CharGlobal = {},
+	Sort = {
+		Desc = 0,
+		Asc = 1,
+		CharDesc = 2,
+		CharAsc = 3,
+		AlphaD = 4,
+		AlphaA = 5,
+		IdDesc = 6,
+		IdAsc = 7
+	}
 }
 
 local KT = KillTrack
@@ -96,7 +106,7 @@ end
 function KT:GetKills(id)
 	local gKills, cKills = 0, 0
 	for k,v in pairs(self.Global.MOBS) do
-		if k == id then
+		if k == id and type(v) == "table" then
 			gKills = v.Kills
 			if self.CharGlobal.MOBS[k] then
 				cKills = self.CharGlobal.MOBS[k].Kills
@@ -113,7 +123,7 @@ function KT:PrintKills(identifier)
 	local cKills = 0
 	if type(identifier) ~= "string" and type(identifier) ~= "number" then identifier = "<No Name>" end
 	for k,v in pairs(self.Global.MOBS) do
-		if tostring(k) == tostring(identifier) or v.Name == identifier then
+		if type(v) == "table" and (tostring(k) == tostring(identifier) or v.Name == identifier) then
 			name = v.Name
 			gKills = v.Kills
 			if self.CharGlobal.MOBS[k] then
@@ -134,6 +144,41 @@ end
 
 function KT:Msg(msg)
 	DEFAULT_CHAT_FRAME:AddMessage("\124cff00FF00[KillTrack]\124r " .. msg)
+end
+
+function KT:GetSortedMobTable(mode)
+	if not tonumber(mode) then mode = self.Sort.Desc end
+	if mode < 0 or mode > 7 then mode = self.Sort.Desc end
+	local t = {}
+	for k,v in pairs(self.Global.MOBS) do
+		local cKills = 0
+		if self.CharGlobal.MOBS[k] and type(v) == "table" then cKills = self.CharGlobal.MOBS[k].Kills end
+		if type(v) == "table" then
+			local entry = {Id = k, Name = v.Name, gKills = v.Kills, cKills = cKills}
+			table.insert(t, entry)
+		end
+	end
+	local function compare(a, b)
+		if mode == self.Sort.Asc then
+			return a.gKills < b.gKills
+		elseif mode == self.Sort.CharDesc then
+			return a.cKills > b.cKills
+		elseif mode == self.Sort.CharAsc then
+			return a.cKills < b.cKills
+		elseif mode == self.Sort.AlphaD then
+			return a.Name > b.Name
+		elseif mode == self.Sort.AlphaA then
+			return a.Name < b.Name
+		elseif mode == self.Sort.IdDesc then
+			return a.Id > b.Id
+		elseif mode == self.Sort.IdAsc then
+			return a.Id < b.Id
+		else
+			return a.gKills > b.gKills -- Descending
+		end
+	end
+	table.sort(t, compare)
+	return t
 end
 
 KT.Frame = CreateFrame("Frame")
