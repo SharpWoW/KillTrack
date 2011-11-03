@@ -19,35 +19,6 @@
 
 local KT = KillTrack
 
-local Treshold
-
-local function Purge(treshold)
-	local count = 0
-	for k,v in pairs(KT.Global.MOBS) do
-		if type(v) == "table" and v.Kills < treshold then
-			KT.Global.MOBS[k] = nil
-			count = count + 1
-		end
-	end
-	for k,v in pairs(KT.CharGlobal.MOBS) do
-		if type(v) == "table" and v.Kills < treshold then
-			KT.CharGlobal.MOBS[k] = nil
-			count = count + 1
-		end
-	end
-	KT:Msg(("Purged %d entries with a kill count below %d"):format(count, treshold))
-	Treshold = nil
-	StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
-end
-
-local function Reset()
-	local count = #KT.Global.MOBS + #KT.CharGlobal.MOBS
-	wipe(KT.Global.MOBS)
-	wipe(KT.CharGlobal.MOBS)
-	KT:Msg(("%d mob entries have been removed!"):format(count))
-	StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
-end
-
 StaticPopupDialogs["KILLTRACK_FINISH"] = {
 	text = "%s entries removed.",
 	button1 = "Okay",
@@ -57,16 +28,29 @@ StaticPopupDialogs["KILLTRACK_FINISH"] = {
 	hideOnEscape = true
 }
 
+StaticPopupDialogs["KILLTRACK_DELETE"] = {
+	text = "Delete %s with ID %s?",
+	button1 = "Delete all",
+	button2 = "Character only",
+	button3 = "Cancel",
+	OnAccept = function() KT:Delete(KT.Temp.DeleteId) end,
+	OnCancel = function() KT:Delete(KT.Temp.DeleteId, true) end, -- Cancel is actually the second (button2) button.
+	showAlert = true,
+	timeout = 10,
+	whileDead = true,
+	hideOnEscape = true
+}
+
 StaticPopupDialogs["KILLTRACK_PURGE"] = {
 	text = "Remove all mob entries with their kill count below this treshold:",
 	button1 = "Purge",
 	button2 = "Cancel",
 	hasEditBox = true,
-	OnAccept = function(self, data, data2) Purge(tonumber(self.editBox:GetText())) end,
-	OnCancel = function() Treshold = nil end,
+	OnAccept = function(self, data, data2) KT:Purge(tonumber(self.editBox:GetText())) end,
+	OnCancel = function() KT.Temp.Treshold = nil end,
 	OnShow = function(self, data)
-		if tonumber(Treshold) then
-			self.editBox:SetText(tostring(Treshold))
+		if tonumber(KT.Temp.Treshold) then
+			self.editBox:SetText(tostring(KT.Temp.Treshold))
 		else
 			self.button1:Disable()
 		end
@@ -89,7 +73,7 @@ StaticPopupDialogs["KILLTRACK_RESET"] = {
 	text = "Remove all mob entries from the database? THIS CANNOT BE REVERSED.",
 	button1 = "Yes",
 	button2 = "No",
-	OnAccept = function() Reset() end,
+	OnAccept = function() KT:Reset() end,
 	showAlert = true,
 	enterClicksFirstButton = true,
 	timeout = 0,
@@ -97,13 +81,21 @@ StaticPopupDialogs["KILLTRACK_RESET"] = {
 	hideOnEscape = true
 }
 
-function KT:Purge(treshold)
+function KT:ShowDelete(id, name)
+	id = tonumber(id)
+	name = tostring(name)
+	if not id then error("'id' must be a number.") end
+	self.Temp.DeleteId = id
+	StaticPopup_Show("KILLTRACK_DELETE", name, id)
+end
+
+function KT:ShowPurge(treshold)
 	if tonumber(treshold) then
-		Treshold = tonumber(treshold)
+		self.Temp.Treshold = tonumber(treshold)
 	end
 	StaticPopup_Show("KILLTRACK_PURGE")
 end
 
-function KT:Reset()
+function KT:ShowReset()
 	StaticPopup_Show("KILLTRACK_RESET")
 end

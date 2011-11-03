@@ -70,6 +70,7 @@ C:Register("__DEFAULT__", function(args)
 	KT:Msg("/kt lookup <name> - Display number of kills on <name>, <name> can also be NPC ID.")
 	KT:Msg("/kt print - Toggle printing kill updates to chat.")
 	KT:Msg("/kt list - Display a list of all mobs entries.")
+	KT:Msg("/kt delete <id> - Delete entry with NPC id <id>.")
 	KT:Msg("/kt purge [treshold] - Open dialog to purge entries, specifiying a treshold here is optional.")
 	KT:Msg("/kt reset - Clear the mob database.")
 	KT:Msg("/kt - Displays this help message.")
@@ -90,14 +91,32 @@ C:Register({"print", "p"}, function(args)
 	end
 end)
 
+C:Register({"delete", "del", "remove", "rem"}, function(args)
+	if #args <= 0 then
+		KT:Msg("Missing argument: id")
+		return
+	end
+	local id = tonumber(args[1])
+	if not id then
+		KT:Msg("Id must be a number")
+		return
+	end
+	if not KT.Global.MOBS[id] then
+		KT:Msg(("Id %d does not exist in the database."):format(id))
+		return
+	end
+	local name = KT.Global.MOBS[id].Name
+	KT:ShowDelete(id, name)
+end)
+
 C:Register({"purge"}, function(args)
 	local treshold
 	if #args >= 1 then treshold = tonumber(args[1]) end
-	KT:Purge(treshold)
+	KT:ShowPurge(treshold)
 end)
 
 C:Register({"reset", "r"}, function(args)
-	KT:Reset()
+	KT:ShowReset()
 end)
 
 C:Register({"lookup", "lo", "check"}, function(args)

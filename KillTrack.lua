@@ -23,6 +23,7 @@ KillTrack = {
 	Events = {},
 	Global = {},
 	CharGlobal = {},
+	Temp = {},
 	Sort = {
 		Desc = 0,
 		Asc = 1,
@@ -181,6 +182,54 @@ function KT:GetSortedMobTable(mode)
 	end
 	table.sort(t, compare)
 	return t
+end
+
+function KT:Delete(id, charOnly)
+	id = tonumber(id)
+	if not id then error(("Expected 'id' param to be number, got %s."):format(type(id))) end
+	local found = false
+	local name
+	if self.Global.MOBS[id] then
+		name = self.Global.MOBS[id].Name
+		if not charOnly then self.Global.MOBS[id] = nil end
+		if self.CharGlobal.MOBS[id] then
+			self.CharGlobal.MOBS[id] = nil
+		end
+		found = true
+	end
+	if found then
+		self:Msg(("Deleted %q (%d) from database."):format(name, id))
+		StaticPopup_Show("KILLTRACK_FINISH", 1)
+	else
+		self:Msg(("ID: %d was not found in the database."):format(id))
+	end
+end
+
+function KT:Purge(treshold)
+	local count = 0
+	for k,v in pairs(KT.Global.MOBS) do
+		if type(v) == "table" and v.Kills < treshold then
+			self.Global.MOBS[k] = nil
+			count = count + 1
+		end
+	end
+	for k,v in pairs(KT.CharGlobal.MOBS) do
+		if type(v) == "table" and v.Kills < treshold then
+			self.CharGlobal.MOBS[k] = nil
+			count = count + 1
+		end
+	end
+	self:Msg(("Purged %d entries with a kill count below %d"):format(count, treshold))
+	self.Temp.Treshold = nil
+	StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
+end
+
+function KT:Reset()
+	local count = #KT.Global.MOBS + #KT.CharGlobal.MOBS
+	wipe(self.Global.MOBS)
+	wipe(self.CharGlobal.MOBS)
+	KT:Msg(("%d mob entries have been removed!"):format(count))
+	StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
 end
 
 KT.Frame = CreateFrame("Frame")
