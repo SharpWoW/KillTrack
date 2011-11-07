@@ -17,7 +17,11 @@
 	* along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-KillTrack.MobList = {}
+local MAX_LOAD_INDEX = 200
+
+KillTrack.MobList = {
+	LoadWarning = false
+}
 
 local KT = KillTrack
 local ML = KT.MobList
@@ -26,7 +30,49 @@ local Sort = KT.Sort.Desc
 
 local GUI = LibStub("AceGUI-3.0")
 
-local frame, scrollHeader, idHeader, nameHeader, cKillsHeader, gKillsHeader, scrollContainer, scroll
+local frame, scrollHeader, idHeader, nameHeader, cKillsHeader, gKillsHeader, scrollContainer, scroll, loadButton
+
+local loadFrame = CreateFrame("Frame")
+
+local index = 0
+local count = 0
+
+local function update(_, elapsed)
+	index = index + 1
+	ML:AddItem(index)
+	local c = floor((index)/100)
+	if c > count and index < MAX_LOAD_INDEX then
+		count = count + 1
+		--w = c/10
+		loadButton:SetDisabled(false)
+		loadFrame:SetScript("OnUpdate", nil)
+	elseif index >= MAX_LOAD_INDEX and not ML.LoadWarning then
+		StaticPopup_Show("KILLTRACK_LOADWARNING")
+		ML.LoadWarning = true
+		loadFrame:SetScript("OnUpdate", nil)
+	elseif index >= #KT.Temp.MobEntries then
+		index = 0
+		count = 0
+		ML.LoadWarning = false
+		frame:SetStatusText(("%d/%d mob entries loaded."):format(#KT.Temp.MobEntries, #KT.Temp.MobEntries))
+		loadButton:SetDisabled(true)
+		loadFrame:SetScript("OnUpdate", nil)
+	end
+end
+
+StaticPopupDialogs["KILLTRACK_LOADWARNING"] = {
+	text = "\124cffFF0000*** WARNING ***\124r\nLoading more than 200 entries may cause severe lag or client crashes.\nDo you want to continue?",
+	button1 = "Continue",
+	button2 = "Purge",
+	button3 = "Cancel",
+	OnAccept = function() loadFrame:SetScript("OnUpdate", update) end,
+	OnCancel = function() index = 0 count = 0 ML.LoadWarning = false ML:HideGUI() KT:ShowPurge() end, -- This is actually button2, not 3
+	OnAlt = function() index = 0 end,
+	showAlert = true,
+	timeout = 0,
+	hideOnEscape = false,
+	whileDead = true
+}
 
 function ML:ShowGUI()
 	frame = GUI:Create("Frame")
@@ -35,6 +81,20 @@ function ML:ShowGUI()
 	frame:SetLayout("Flow")
 	frame:SetTitle("KillTrack - Mob List")
 	frame:SetCallback("OnClose", function(frame) frame:Release() end)
+
+	local loadHeader = GUI:Create("SimpleGroup")
+	loadHeader:SetFullWidth(true)
+	loadHeader:SetLayout("Flow")
+	loadButton = GUI:Create("Button")
+	loadButton:SetText("Load more entries")
+	loadButton:SetFullWidth(true)
+	loadButton:SetHeight(24)
+	loadButton:SetCallback("OnClick", function(button)
+		button:SetDisabled(true)
+		loadFrame:SetScript("OnUpdate", update)
+	end)
+	loadButton:SetDisabled(true)
+	loadHeader:AddChild(loadButton)
 
 	scrollHeader = GUI:Create("SimpleGroup")
 	scrollHeader:SetFullWidth(true)
@@ -46,6 +106,10 @@ function ML:ShowGUI()
 	idHeader:SetColor(1, 1, 0)
 	idHeader:SetHighlight(0.1, 0.1, 0.1)
 	idHeader:SetCallback("OnClick", function()
+		loadButton:SetDisabled(true)
+		index = 0
+		count = 0
+		ML.LoadWarning = false
 		if Sort == KT.Sort.IdAsc then
 			Sort = KT.Sort.IdDesc
 		else
@@ -60,6 +124,10 @@ function ML:ShowGUI()
 	nameHeader:SetColor(1, 1, 0)
 	nameHeader:SetHighlight(0.1, 0.1, 0.1)
 	nameHeader:SetCallback("OnClick", function()
+		loadButton:SetDisabled(true)
+		index = 0
+		count = 0
+		ML.LoadWarning = false
 		if Sort == KT.Sort.AlphaA then
 			Sort = KT.Sort.AlphaD
 		else
@@ -74,6 +142,10 @@ function ML:ShowGUI()
 	cKillsHeader:SetColor(1, 1, 0)
 	cKillsHeader:SetHighlight(0.1, 0.1, 0.1)
 	cKillsHeader:SetCallback("OnClick", function()
+		loadButton:SetDisabled(true)
+		index = 0
+		count = 0
+		ML.LoadWarning = false
 		if Sort == KT.Sort.CharDesc then
 			Sort = KT.Sort.CharAsc
 		else
@@ -88,6 +160,10 @@ function ML:ShowGUI()
 	gKillsHeader:SetColor(1, 1, 0)
 	gKillsHeader:SetHighlight(0.1, 0.1, 0.1)
 	gKillsHeader:SetCallback("OnClick", function()
+		loadButton:SetDisabled(true)
+		index = 0
+		count = 0
+		ML.LoadWarning = false
 		if Sort == KT.Sort.Desc then
 			Sort = KT.Sort.Asc
 		else
@@ -110,6 +186,7 @@ function ML:ShowGUI()
 
 	scrollContainer:AddChild(scroll)
 
+	frame:AddChild(loadHeader)
 	frame:AddChild(scrollHeader)
 	frame:AddChild(scrollContainer)
 
@@ -118,6 +195,45 @@ end
 
 function ML:HideGUI()
 	frame:Release()
+end
+
+function ML:AddItem(index)
+	local entry = KT.Temp.MobEntries[index]
+	local container = GUI:Create("SimpleGroup")
+	container:SetFullWidth(true)
+	container:SetLayout("Flow")
+	local id = GUI:Create("InteractiveLabel")
+	id:SetWidth(100)
+	id:SetFont("Fonts\\FRIZQT__.TTF", 12)
+	id:SetText(tostring(entry.Id))
+	id:SetColor(1, 1, 1)
+	id:SetHighlight(0.1, 0.1, 0.1)
+	id:SetUserData("NPC_ID", entry.Id)
+	id:SetUserData("NPC_NAME", entry.Name)
+	id:SetCallback("OnClick", function(self)
+		KT:ShowDelete(self:GetUserData("NPC_ID"), self:GetUserData("NPC_NAME"))
+	end)
+	local name = GUI:Create("Label")
+	name:SetWidth(200)
+	name:SetFont("Fonts\\FRIZQT__.TTF", 12)
+	name:SetText(entry.Name)
+	name:SetColor(1, 1, 1)
+	local cKills = GUI:Create("Label")
+	cKills:SetWidth(100)
+	cKills:SetFont("Fonts\\FRIZQT__.TTF", 12)
+	cKills:SetText(entry.cKills)
+	cKills:SetColor(1, 1, 1)
+	local gKills = GUI:Create("Label")
+	gKills:SetWidth(100)
+	gKills:SetFont("Fonts\\FRIZQT__.TTF", 12)
+	gKills:SetText(entry.gKills)
+	gKills:SetColor(1, 1, 1)
+	container:AddChild(id)
+	container:AddChild(name)
+	container:AddChild(cKills)
+	container:AddChild(gKills)
+	scroll:AddChild(container)
+	frame:SetStatusText(("%d/%d mob entries loaded."):format(index, #KT.Temp.MobEntries))
 end
 
 function ML:UpdateList()
@@ -144,6 +260,24 @@ function ML:UpdateList()
 	end
 
 	scroll:ReleaseChildren()
+
+	KT.Temp.MobEntries = KT:GetSortedMobTable(Sort)
+
+	loadFrame:SetScript("OnUpdate", update)
+
+	--[[
+	local co = coroutine.create(AddItems)
+
+	while coroutine.status(co) ~= "dead" do
+		local errorfree, count, container = coroutine.resume(co)
+		if errorfree then
+			scroll:AddChild(container)
+
+		else
+			message("Unknown error encountered while loading mob list.")
+			error("Unknown error encountered while loading mob list.")
+		end
+	end
 
 	local entries = KT:GetSortedMobTable(Sort)
 
@@ -183,6 +317,5 @@ function ML:UpdateList()
 		container:AddChild(gKills)
 		scroll:AddChild(container)
 	end
-	
-	frame:SetStatusText(("%d mob entries loaded."):format(#entries))
+	--]]
 end

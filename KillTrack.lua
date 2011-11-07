@@ -83,7 +83,7 @@ function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 	if not UnitCanAttack("player", "mouseover") then return end
 	local id = KTT:GUIDToID(UnitGUID("mouseover"))
 	local gKills, cKills = self:GetKills(id)
-	GameTooltip:AddLine(("Killed %d (%d) times."):format(gKills, cKills), 1, 1, 1)
+	GameTooltip:AddLine(("Killed %d (%d) times."):format(cKills, gKills), 1, 1, 1)
 	GameTooltip:Show()
 end
 
