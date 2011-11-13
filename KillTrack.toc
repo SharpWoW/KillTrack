@@ -1,5 +1,5 @@
 ## Interface: 40200
-## Version: v1
+## Version: @project-version@
 ## Title: KillTrack
 ## Notes: Tracks kills.
 ## Author: F16Gaming
@@ -16,4 +16,3 @@ KillTrack.lua
 Dialogs.lua
 Command.lua
 MobList.lua
-#MobList.xml
