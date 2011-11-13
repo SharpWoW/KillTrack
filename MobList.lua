@@ -35,13 +35,13 @@ local frame, scrollHeader, idHeader, nameHeader, cKillsHeader, gKillsHeader, scr
 local loadFrame = CreateFrame("Frame")
 
 local index = 0
-local count = 0
+local count = 1
 
 local function update(_, elapsed)
 	index = index + 1
 	ML:AddItem(index)
 	local c = floor((index)/100)
-	if c > count and index < MAX_LOAD_INDEX then
+	if c == count and index ~= MAX_LOAD_INDEX then
 		count = count + 1
 		--w = c/10
 		loadButton:SetDisabled(false)
@@ -52,7 +52,7 @@ local function update(_, elapsed)
 		loadFrame:SetScript("OnUpdate", nil)
 	elseif index >= #KT.Temp.MobEntries then
 		index = 0
-		count = 0
+		count = 1
 		ML.LoadWarning = false
 		frame:SetStatusText(("%d/%d mob entries loaded."):format(#KT.Temp.MobEntries, #KT.Temp.MobEntries))
 		loadButton:SetDisabled(true)
@@ -65,8 +65,8 @@ StaticPopupDialogs["KILLTRACK_LOADWARNING"] = {
 	button1 = "Continue",
 	button2 = "Purge",
 	button3 = "Cancel",
-	OnAccept = function() loadFrame:SetScript("OnUpdate", update) end,
-	OnCancel = function() index = 0 count = 0 ML.LoadWarning = false ML:HideGUI() KT:ShowPurge() end, -- This is actually button2, not 3
+	OnAccept = function() count = count + 1 loadFrame:SetScript("OnUpdate", update) end,
+	OnCancel = function() index = 0 count = 1 ML.LoadWarning = false ML:HideGUI() KT:ShowPurge() end, -- This is actually button2, not 3
 	OnAlt = function() index = 0 end,
 	showAlert = true,
 	timeout = 0,
@@ -75,11 +75,18 @@ StaticPopupDialogs["KILLTRACK_LOADWARNING"] = {
 }
 
 function ML:ShowGUI()
+	index = 0
+	count = 1
+
 	frame = GUI:Create("Frame")
 	frame:SetHeight(600)
 	frame:SetWidth(560)
 	frame:SetLayout("Flow")
 	frame:SetTitle("KillTrack - Mob List")
+	frame:SetCallback("OnRelease", function(frame)
+		index = 0
+		count = 1
+	end)
 	frame:SetCallback("OnClose", function(frame) frame:Release() end)
 
 	local loadHeader = GUI:Create("SimpleGroup")
@@ -108,7 +115,7 @@ function ML:ShowGUI()
 	idHeader:SetCallback("OnClick", function()
 		loadButton:SetDisabled(true)
 		index = 0
-		count = 0
+		count = 1
 		ML.LoadWarning = false
 		if Sort == KT.Sort.IdAsc then
 			Sort = KT.Sort.IdDesc
@@ -126,7 +133,7 @@ function ML:ShowGUI()
 	nameHeader:SetCallback("OnClick", function()
 		loadButton:SetDisabled(true)
 		index = 0
-		count = 0
+		count = 1
 		ML.LoadWarning = false
 		if Sort == KT.Sort.AlphaA then
 			Sort = KT.Sort.AlphaD
@@ -144,7 +151,7 @@ function ML:ShowGUI()
 	cKillsHeader:SetCallback("OnClick", function()
 		loadButton:SetDisabled(true)
 		index = 0
-		count = 0
+		count = 1
 		ML.LoadWarning = false
 		if Sort == KT.Sort.CharDesc then
 			Sort = KT.Sort.CharAsc
@@ -162,7 +169,7 @@ function ML:ShowGUI()
 	gKillsHeader:SetCallback("OnClick", function()
 		loadButton:SetDisabled(true)
 		index = 0
-		count = 0
+		count = 1
 		ML.LoadWarning = false
 		if Sort == KT.Sort.Desc then
 			Sort = KT.Sort.Asc
@@ -266,19 +273,6 @@ function ML:UpdateList()
 	loadFrame:SetScript("OnUpdate", update)
 
 	--[[
-	local co = coroutine.create(AddItems)
-
-	while coroutine.status(co) ~= "dead" do
-		local errorfree, count, container = coroutine.resume(co)
-		if errorfree then
-			scroll:AddChild(container)
-
-		else
-			message("Unknown error encountered while loading mob list.")
-			error("Unknown error encountered while loading mob list.")
-		end
-	end
-
 	local entries = KT:GetSortedMobTable(Sort)
 
 	for i,v in ipairs(entries) do
