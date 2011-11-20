@@ -40,6 +40,10 @@ local KT = KillTrack
 
 local KTT = KillTrack_Tools
 
+if KT.Version == "@" .. "project-version" .. "@" then
+	KT.Version = "Development"
+end
+
 function KT:OnEvent(_, event, ...)
 	if self.Events[event] then
 		self.Events[event](self, ...)
