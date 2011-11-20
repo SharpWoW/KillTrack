@@ -30,7 +30,7 @@ end
 T.Frame = CreateFrame("Frame")
 
 local function TimeCheck(_, _)
-	if not T.Running then print("TIMER AUTO-STOP") T.Frame:SetScript("OnUpdate", nil) return end
+	if not T.Running then T.Frame:SetScript("OnUpdate", nil) return end
 	local now = time()
 	TimerData.Last = now
 	TimerData.Current = now - T.Time.Start
@@ -41,7 +41,7 @@ local function TimeCheck(_, _)
 	TimerData.LeftFormat = FormatTime(TimerData.Left)
 	TimerData.Progress = TimerData.Current / TimerData.Total
 	T:RunCallback(T:GetAllData(), T.State.UPDATE)
-	if now >= T.Time.Stop then print("TIMER REACHED END") T:Stop() end
+	if now >= T.Time.Stop then T:Stop() end
 end
 
 function T:GetAllData()
@@ -89,7 +89,6 @@ function T:Start(seconds, minutes, hours, callback, data)
 	self.Time.Stop = self.Time.Start + seconds
 	self:RunCallback(self:GetAllData(), self.State.START)
 	self.Frame:SetScript("OnUpdate", TimeCheck)
-	print("TIMER START")
 end
 
 function T:Stop()
@@ -98,7 +97,6 @@ function T:Stop()
 	self:RunCallback(self:GetAllData(), self.State.STOP)
 	self.Running = false
 	self.Time.Diff = self.Time.Stop - self.Time.Start
-	print("TIMER STOPPED")
 	return self.Time.Diff
 end
 
