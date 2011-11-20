@@ -132,6 +132,36 @@ C:Register({"list", "moblist", "mobs"}, function(args)
 	KT.MobList:ShowGUI()
 end)
 
+C:Register({"time", "timer"}, function(args)
+	if #args <= 0 then
+		KT:Msg("Usage: time <seconds> [minutes] [hours]")
+		KT:Msg("Usage: time <seconds>[s<minutes>m[<hours>h]]")
+		return
+	end
+	
+	local s, m, h
+	
+	if #args == 1 then
+		if not tonumber(args[1]) then
+			args[1] = args[1]:lower()
+			s = args[1]:match("(%d+)s")
+			m = args[1]:match("(%d+)m")
+			h = args[1]:match("(%d+)h")
+			if not s and not m and not h then
+				KT:Msg("Invalid number format.")
+				return
+			end
+		else
+			s = tonumber(args[1])
+		end
+	else
+		s = tonumber(args[1])
+		m = tonumber(args[2])
+		h = tonumber(args[3])
+	end
+	KT.TimerFrame:Start(s, m, h)
+end)
+
 for i,v in ipairs(C.Slash) do
 	_G["SLASH_" .. KT.Name:upper() .. i] = "/" .. v
 end

@@ -76,6 +76,9 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local name = tostring((select(9, ...)))
 	if id == 0 then return end
 	self:AddKill(id, name)
+	if self.Timer:IsRunning() then
+		self.Timer:SetData("Kills", self.Timer:GetData("Kills", true) + 1)
+	end
 end
 
 function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)

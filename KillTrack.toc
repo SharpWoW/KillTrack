@@ -16,3 +16,6 @@ KillTrack.lua
 Dialogs.lua
 Command.lua
 MobList.lua
+Timer.lua
+TimerFrame.lua
+TimerFrame.xml
