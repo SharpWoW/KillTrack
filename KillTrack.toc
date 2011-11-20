@@ -1,7 +1,7 @@
 ## Interface: 40200
 ## Version: @project-version@
 ## Title: KillTrack
-## Notes: Tracks kills.
+## Notes: Keeps track of how many kills you have per mob and displays them in a list.
 ## Author: F16Gaming
 ## SavedVariables: KILLTRACK
 ## SavedVariablesPerCharacter: KILLTRACK_CHAR
