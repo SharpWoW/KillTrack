@@ -73,6 +73,7 @@ C:Register("__DEFAULT__", function(args)
 	KT:Msg("/kt delete <id> - Delete entry with NPC id <id>.")
 	KT:Msg("/kt purge [treshold] - Open dialog to purge entries, specifiying a treshold here is optional.")
 	KT:Msg("/kt reset - Clear the mob database.")
+	KT:Msg("/kt time - Track kills within specified time.")
 	KT:Msg("/kt - Displays this help message.")
 end)
 
@@ -135,7 +136,7 @@ end)
 C:Register({"time", "timer"}, function(args)
 	if #args <= 0 then
 		KT:Msg("Usage: time <seconds> [minutes] [hours]")
-		KT:Msg("Usage: time <seconds>[s<minutes>m[<hours>h]]")
+		KT:Msg("Usage: time [<seconds>s][<minutes>m][<hours>h]")
 		return
 	end
 	
