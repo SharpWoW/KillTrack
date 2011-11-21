@@ -25,7 +25,8 @@ I would prefer if you use the Issues page here on GitHub instead of the ones on 
 External links
 --------------
 
-KillTrack on Curse: (Will be up soon)  
-KillTrack on WoWInterface: (Will be up soon)
+[KillTrack on Curse](http://www.curse.com/addons/wow/killtrack "KillTrack - Curse")  
+[KillTrack on CurseForge](http://wow.curseforge.com/addons/killtrack/ "KillTrack - CurseForge")  
+[KillTrack on WoWInterface](http://www.wowinterface.com/downloads/info20509-KillTrack.html "KillTrack - WoWInterface")
 
 All images of the AddOn will be kept on Curse or WoWInterface.
