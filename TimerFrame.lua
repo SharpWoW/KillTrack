@@ -86,7 +86,10 @@ function TF:Start(s, m, h)
 	self.Running = true
 	self:InitializeControls()
 	KillTrackTimerFrame:Show()
-	T:Start(s, m, h, function(d, u) TF:UpdateData(d, u) end, nil)
+	if not T:Start(s, m, h, function(d, u) TF:UpdateData(d, u) end, nil) then
+		self:Stop()
+		KillTrackTimerFrame:Hide()
+	end
 end
 
 function TF:Stop()

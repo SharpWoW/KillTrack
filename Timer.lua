@@ -75,7 +75,7 @@ function T:Start(seconds, minutes, hours, callback, data)
 	if seconds <= 0 then
 		self.Running = false
 		KT:Msg("Time must be greater than zero.")
-		return
+		return false
 	end
 	if type(callback) == "function" then
 		self:SetCallback(callback)
@@ -89,6 +89,7 @@ function T:Start(seconds, minutes, hours, callback, data)
 	self.Time.Stop = self.Time.Start + seconds
 	self:RunCallback(self:GetAllData(), self.State.START)
 	self.Frame:SetScript("OnUpdate", TimeCheck)
+	return true
 end
 
 function T:Stop()
