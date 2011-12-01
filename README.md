@@ -16,6 +16,18 @@ Ever wanted to track how many kills you accumulate within a certain time? You ca
 
 You simply tell it how long to track, and a window will pop up listing number of kills, time left, kills per minute and kills per second.
 
+
+Kill Records
+------------
+
+When you've killed a certain mob a certain number of times (1000 by default), KillTrack will notify you with a small gratulation message!
+
+If you have the AddOn Glamour installed, it will show in the style of a guild achievement.
+
+To change the threshold, use the command /kt threshold <threshold>, where <threshold> is the new threshold.
+
+E.g: If you set the threshold to 100, then after you've killed a mob 100 times, it will notify you. And continue to notify you for every 100th kill.
+
 Feedback
 --------
 
