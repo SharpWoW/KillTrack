@@ -60,8 +60,8 @@ function KT.Events.ADDON_LOADED(self, ...)
 	if type(self.Global.PRINTKILLS) ~= "boolean" then
 		self.Global.PRINTKILLS = true
 	end
-	if type(self.Global.ACHIEV_TRESHOLD) ~= "number" then
-		self.Global.ACHIEV_TRESHOLD = 1000
+	if type(self.Global.ACHIEV_THRESHOLD) ~= "number" then
+		self.Global.ACHIEV_THRESHOLD = 1000
 	end
 	if type(self.Global.MOBS) ~= "table" then
 		self.Global.MOBS = {}
@@ -97,12 +97,12 @@ function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 	GameTooltip:Show()
 end
 
-function KT:SetTreshold(treshold)
-	if type(treshold) ~= "number" then
-		error("KillTrack.SetTreshold: Argument #1 (treshold) must be of type 'number'")
+function KT:SetThreshold(threshold)
+	if type(threshold) ~= "number" then
+		error("KillTrack.SetThreshold: Argument #1 (threshold) must be of type 'number'")
 	end
-	self.Global.ACHIEV_TRESHOLD = treshold
-	KT:Msg(("New kill notice (achievement) treshold set to %d."):format(treshold))
+	self.Global.ACHIEV_THRESHOLD = threshold
+	KT:Msg(("New kill notice (achievement) threshold set to %d."):format(threshold))
 end
 
 function KT:AddKill(id, name)
@@ -121,13 +121,13 @@ function KT:AddKill(id, name)
 		self:Msg(("Updated %q, new kill count: %d. Kill count on this character: %d"):format(name, self.Global.MOBS[id].Kills, self.CharGlobal.MOBS[id].Kills))
 	end
 	if type(self.Global.MOBS[id].AchievCount) ~= "number" then
-		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_TRESHOLD)
+		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
 		if self.Global.MOBS[id].AchievCount >= 1 then
 			self:KillAlert(self.Global.MOBS[id])
 		end
 	else
 		local achievCount = self.Global.MOBS[id].AchievCount
-		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_TRESHOLD)
+		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
 		if self.Global.MOBS[id].AchievCount > achievCount then
 			self:KillAlert(self.Global.MOBS[id])
 		end
@@ -264,22 +264,22 @@ function KT:Delete(id, charOnly)
 	end
 end
 
-function KT:Purge(treshold)
+function KT:Purge(threshold)
 	local count = 0
 	for k,v in pairs(KT.Global.MOBS) do
-		if type(v) == "table" and v.Kills < treshold then
+		if type(v) == "table" and v.Kills < threshold then
 			self.Global.MOBS[k] = nil
 			count = count + 1
 		end
 	end
 	for k,v in pairs(KT.CharGlobal.MOBS) do
-		if type(v) == "table" and v.Kills < treshold then
+		if type(v) == "table" and v.Kills < threshold then
 			self.CharGlobal.MOBS[k] = nil
 			count = count + 1
 		end
 	end
-	self:Msg(("Purged %d entries with a kill count below %d"):format(count, treshold))
-	self.Temp.Treshold = nil
+	self:Msg(("Purged %d entries with a kill count below %d"):format(count, threshold))
+	self.Temp.Threshold = nil
 	StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
 end
 

@@ -42,15 +42,15 @@ StaticPopupDialogs["KILLTRACK_DELETE"] = {
 }
 
 StaticPopupDialogs["KILLTRACK_PURGE"] = {
-	text = "Remove all mob entries with their kill count below this treshold:",
+	text = "Remove all mob entries with their kill count below this threshold:",
 	button1 = "Purge",
 	button2 = "Cancel",
 	hasEditBox = true,
 	OnAccept = function(self, data, data2) KT:Purge(tonumber(self.editBox:GetText())) end,
-	OnCancel = function() KT.Temp.Treshold = nil end,
+	OnCancel = function() KT.Temp.Threshold = nil end,
 	OnShow = function(self, data)
-		if tonumber(KT.Temp.Treshold) then
-			self.editBox:SetText(tostring(KT.Temp.Treshold))
+		if tonumber(KT.Temp.Threshold) then
+			self.editBox:SetText(tostring(KT.Temp.Threshold))
 		else
 			self.button1:Disable()
 		end
@@ -89,9 +89,9 @@ function KT:ShowDelete(id, name)
 	StaticPopup_Show("KILLTRACK_DELETE", name, id)
 end
 
-function KT:ShowPurge(treshold)
-	if tonumber(treshold) then
-		self.Temp.Treshold = tonumber(treshold)
+function KT:ShowPurge(threshold)
+	if tonumber(threshold) then
+		self.Temp.Threshold = tonumber(threshold)
 	end
 	StaticPopup_Show("KILLTRACK_PURGE")
 end
