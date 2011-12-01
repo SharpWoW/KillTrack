@@ -74,6 +74,7 @@ C:Register("__DEFAULT__", function(args)
 	KT:Msg("/kt purge [treshold] - Open dialog to purge entries, specifiying a treshold here is optional.")
 	KT:Msg("/kt reset - Clear the mob database.")
 	KT:Msg("/kt time - Track kills within specified time.")
+	KT:Msg("/kt treshold <treshold> - Set treshold for kill record notices to show.")
 	KT:Msg("/kt - Displays this help message.")
 end)
 
@@ -161,6 +162,21 @@ C:Register({"time", "timer"}, function(args)
 		h = tonumber(args[3])
 	end
 	KT.TimerFrame:Start(s, m, h)
+end)
+
+C:Register({"treshold"}, function(args)
+	if #args <= 0 then
+		KT:Msg("Usage: treshold <treshold>")
+		KT:Msg("E.g: /kt treshold 100")
+		KT:Msg("    Notice will be shown on every 100th kill.")
+		return
+	end
+	local t = tonumber(args[1])
+	if t then
+		KT:SetTreshold(t)
+	else
+		KT:Msg("Argument must be a number.")
+	end
 end)
 
 for i,v in ipairs(C.Slash) do

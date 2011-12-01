@@ -60,6 +60,9 @@ function KT.Events.ADDON_LOADED(self, ...)
 	if type(self.Global.PRINTKILLS) ~= "boolean" then
 		self.Global.PRINTKILLS = true
 	end
+	if type(self.Global.ACHIEV_TRESHOLD) ~= "number" then
+		self.Global.ACHIEV_TRESHOLD = 1000
+	end
 	if type(self.Global.MOBS) ~= "table" then
 		self.Global.MOBS = {}
 	end
@@ -94,6 +97,14 @@ function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 	GameTooltip:Show()
 end
 
+function KT:SetTreshold(treshold)
+	if type(treshold) ~= "number" then
+		error("KillTrack.SetTreshold: Argument #1 (treshold) must be of type 'number'")
+	end
+	self.Global.ACHIEV_TRESHOLD = treshold
+	KT:Msg(("New kill notice (achievement) treshold set to %d."):format(treshold))
+end
+
 function KT:AddKill(id, name)
 	name = name or "<No Name>"
 	if type(self.Global.MOBS[id]) ~= "table" then
@@ -110,13 +121,13 @@ function KT:AddKill(id, name)
 		self:Msg(("Updated %q, new kill count: %d. Kill count on this character: %d"):format(name, self.Global.MOBS[id].Kills, self.CharGlobal.MOBS[id].Kills))
 	end
 	if type(self.Global.MOBS[id].AchievCount) ~= "number" then
-		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / 1000)
+		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_TRESHOLD)
 		if self.Global.MOBS[id].AchievCount >= 1 then
 			self:KillAlert(self.Global.MOBS[id])
 		end
 	else
 		local achievCount = self.Global.MOBS[id].AchievCount
-		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / 1000)
+		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_TRESHOLD)
 		if self.Global.MOBS[id].AchievCount > achievCount then
 			self:KillAlert(self.Global.MOBS[id])
 		end
@@ -175,6 +186,10 @@ function KT:KillAlert(mob)
 		FrameStyle = "GuildAchievement"
 	}
 	if IsAddOnLoaded("Glamour") then
+		if not GlamourShowAlert then
+			KT:Msg("ERROR: GlamourShowAlert == nil! Notify AddOn developer.")
+			return
+		end
 		GlamourShowAlert(500, data)
 	else
 		RaidNotice_AddMessage(RaidBossEmoteFrame, data.Text, ChatTypeInfo["SYSTEM"])
