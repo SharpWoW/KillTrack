@@ -97,7 +97,7 @@ end
 function KT:AddKill(id, name)
 	name = name or "<No Name>"
 	if type(self.Global.MOBS[id]) ~= "table" then
-		self.Global.MOBS[id] = { Name = name, Kills = 0 }
+		self.Global.MOBS[id] = { Name = name, Kills = 0, AchievCount = 0 }
 		self:Msg(("Created new entry for %q"):format(name))
 	end
 	self.Global.MOBS[id].Kills = self.Global.MOBS[id].Kills + 1
@@ -108,6 +108,18 @@ function KT:AddKill(id, name)
 	self.CharGlobal.MOBS[id].Kills = self.CharGlobal.MOBS[id].Kills + 1
 	if self.Global.PRINTKILLS then
 		self:Msg(("Updated %q, new kill count: %d. Kill count on this character: %d"):format(name, self.Global.MOBS[id].Kills, self.CharGlobal.MOBS[id].Kills))
+	end
+	if type(self.Global.MOBS[id].AchievCount) ~= "number" then
+		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / 1000)
+		if self.Global.MOBS[id].AchievCount >= 1 then
+			self:KillAlert(self.Global.MOBS[id])
+		end
+	else
+		local achievCount = self.Global.MOBS[id].AchievCount
+		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / 1000)
+		if self.Global.MOBS[id].AchievCount > achievCount then
+			self:KillAlert(self.Global.MOBS[id])
+		end
 	end
 end
 
@@ -152,6 +164,31 @@ end
 
 function KT:Msg(msg)
 	DEFAULT_CHAT_FRAME:AddMessage("\124cff00FF00[KillTrack]\124r " .. msg)
+end
+
+function KT:KillAlert(mob)
+	local data = {
+		Text = ("%d kills on %s!"):format(mob.Kills, mob.Name),
+		Title = "Kill Record!",
+		bTitle = "Congratulations!",
+		Icon = "Interface\\Icons\\ABILITY_Deathwing_Bloodcorruption_Death",
+		FrameStyle = "GuildAchievement"
+	}
+	if IsAddOnLoaded("Glamour") then
+		GlamourShowAlert(500, data)
+	else
+		RaidNotice_AddMessage(RaidBossEmoteFrame, data.Text, ChatTypeInfo["SYSTEM"])
+		RaidNotice_AddMessage(RaidBossEmoteFrame, data.Text, ChatTypeInfo["SYSTEM"])
+	end
+end
+
+function KT:GetMob(id)
+	for k,v in pairs(self.Global.MOBS) do
+		if type(v) == "table" and (tostring(k) == tostring(id) or v.Name == id) then
+			return v, self.CharGlobal.MOBS[k]
+		end
+	end
+	return false, nil
 end
 
 function KT:GetSortedMobTable(mode)
@@ -246,9 +283,3 @@ for k,_ in pairs(KT.Events) do
 end
 
 KT.Frame:SetScript("OnEvent", function(_, event, ...) KT:OnEvent(_, event, ...) end)
-
--------------------
--- DISPLAY FRAME --
--------------------
-
---KT.Display = CreateFrame("Frame")
