@@ -102,6 +102,7 @@ function KT:SetThreshold(threshold)
 		error("KillTrack.SetThreshold: Argument #1 (threshold) must be of type 'number'")
 	end
 	self.Global.ACHIEV_THRESHOLD = threshold
+	self:ResetAchievCount()
 	KT:Msg(("New kill notice (achievement) threshold set to %d."):format(threshold))
 end
 
@@ -289,6 +290,12 @@ function KT:Reset()
 	wipe(self.CharGlobal.MOBS)
 	KT:Msg(("%d mob entries have been removed!"):format(count))
 	StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
+end
+
+function KT:ResetAchievCount()
+	for _,v in pairs(self.Global.MOBS) do
+		v.AchievCount = floor(v.Kills / self.Global.ACHIEV_THRESHOLD)
+	end
 end
 
 KT.Frame = CreateFrame("Frame")
