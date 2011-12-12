@@ -75,6 +75,7 @@ C:Register("__DEFAULT__", function(args)
 	KT:Msg("/kt reset - Clear the mob database.")
 	KT:Msg("/kt time - Track kills within specified time.")
 	KT:Msg("/kt threshold <threshold> - Set threshold for kill record notices to show.")
+	KT:Msg("/kt countmode - Toggle between counting group killing blows or your killing blows only.")
 	KT:Msg("/kt - Displays this help message.")
 end)
 
@@ -177,6 +178,10 @@ C:Register({"threshold"}, function(args)
 	else
 		KT:Msg("Argument must be a number.")
 	end
+end)
+
+C:Register({"countmode", "cm", "count", "counttype", "changecount", "switchcount"}, function(args)
+	KT:ToggleCountMode()
 end)
 
 for i,v in ipairs(C.Slash) do

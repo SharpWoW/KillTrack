@@ -63,6 +63,9 @@ function KT.Events.ADDON_LOADED(self, ...)
 	if type(self.Global.ACHIEV_THRESHOLD) ~= "number" then
 		self.Global.ACHIEV_THRESHOLD = 1000
 	end
+	if type(self.Global.COUNT_GROUP) ~= "boolean" then
+		self.Global.COUNT_GROUP = false
+	end
 	if type(self.Global.MOBS) ~= "table" then
 		self.Global.MOBS = {}
 	end
@@ -78,7 +81,16 @@ end
 
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local event = (select(2, ...))
-	if event ~= "PARTY_KILL" then return end
+	if event ~= "UNIT_DIED" then return end
+	-- Perform solo/group checks
+	local source = tostring((select(5, ...)))
+	local pass
+	if self.Global.COUNT_GROUP then
+		pass = self:IsInGroup(source)
+	else
+		pass = UnitName("player") == source
+	end
+	if not pass then return end
 	local id = KTT:GUIDToID((select(8, ...)))
 	local name = tostring((select(9, ...)))
 	if id == 0 then return end
@@ -97,6 +109,13 @@ function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 	GameTooltip:Show()
 end
 
+function KT:IsInGroup(unit)
+	if unit == UnitName("player") then return true end
+	if UnitInParty(unit) then return true end
+	if UnitInRaid(unit) then return true end
+	return false
+end
+
 function KT:SetThreshold(threshold)
 	if type(threshold) ~= "number" then
 		error("KillTrack.SetThreshold: Argument #1 (threshold) must be of type 'number'")
@@ -104,6 +123,15 @@ function KT:SetThreshold(threshold)
 	self.Global.ACHIEV_THRESHOLD = threshold
 	self:ResetAchievCount()
 	KT:Msg(("New kill notice (achievement) threshold set to %d."):format(threshold))
+end
+
+function KT:ToggleCountMode()
+	self.Global.COUNT_GROUP = not self.Global.COUNT_GROUP
+	if self.Global.COUNT_GROUP then
+		KT:Msg("Now counting kills for every player in the group (party/raid)!")
+	else
+		KT:Msg("Now counting your own killing blows ONLY.")
+	end
 end
 
 function KT:AddKill(id, name)
