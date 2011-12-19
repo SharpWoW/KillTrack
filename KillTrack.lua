@@ -83,7 +83,7 @@ end
 
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local event = (select(2, ...))
-	if event == "SWING_DAMAGE" or event == "RANGED_DAMAGE" or event == "SPELL_DAMAGE" then
+	if event == "SWING_DAMAGE" or event == "RANGE_DAMAGE" or event == "SPELL_DAMAGE" then
 		local s_name = tostring((select(5, ...)))
 		local t_id = tonumber(KTT:GUIDToID((select(8, ...))))
 		DamageTrack[t_id] = s_name
