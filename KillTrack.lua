@@ -40,6 +40,8 @@ local KT = KillTrack
 
 local KTT = KillTrack_Tools
 
+local DamageTrack = {}
+
 if KT.Version == "@" .. "project-version" .. "@" then
 	KT.Version = "Development"
 end
@@ -81,18 +83,23 @@ end
 
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local event = (select(2, ...))
+	if event == "SWING_DAMAGE" or event == "RANGED_DAMAGE" or event == "SPELL_DAMAGE" then
+		local s_name = tostring((select(5, ...)))
+		local t_id = tonumber(KTT:GUIDToID((select(8, ...))))
+		DamageTrack[t_id] = s_name
+	end
 	if event ~= "UNIT_DIED" then return end
 	-- Perform solo/group checks
-	local source = tostring((select(5, ...)))
-	local pass
-	if self.Global.COUNT_GROUP then
-		pass = self:IsInGroup(source)
-	else
-		pass = UnitName("player") == source
-	end
-	if not pass then return end
 	local id = KTT:GUIDToID((select(8, ...)))
 	local name = tostring((select(9, ...)))
+	local lastDamage = DamageTrack[id] or "<No One>"
+	local pass
+	if self.Global.COUNT_GROUP then
+		pass = self:IsInGroup(lastDamage)
+	else
+		pass = UnitName("player") == lastDamage
+	end
+	if not pass then return end
 	if id == 0 then return end
 	self:AddKill(id, name)
 	if self.Timer:IsRunning() then
