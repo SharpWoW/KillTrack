@@ -231,6 +231,7 @@ function KT:KillAlert(mob)
 		RaidNotice_AddMessage(RaidBossEmoteFrame, data.Text, ChatTypeInfo["SYSTEM"])
 		RaidNotice_AddMessage(RaidBossEmoteFrame, data.Text, ChatTypeInfo["SYSTEM"])
 	end
+	self:Msg(data.Text)
 end
 
 function KT:GetMob(id)
