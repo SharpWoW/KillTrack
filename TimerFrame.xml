@@ -148,7 +148,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parent_CancelButton" inherits="UIPanelButtonTemplate2" text="Cancel">
+			<Button name="$parent_CancelButton" inherits="UIPanelButtonTemplate" text="Cancel">
 				<Size>
 					<AbsDimension x="60" y="16" />
 				</Size>
@@ -164,7 +164,7 @@
 					<OnClick>KillTrack.TimerFrame:Cancel();</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parent_CloseButton" inherits="UIPanelButtonTemplate2" text="Close">
+			<Button name="$parent_CloseButton" inherits="UIPanelButtonTemplate" text="Close">
 				<Size>
 					<AbsDimension x="60" y="16" />
 				</Size>
