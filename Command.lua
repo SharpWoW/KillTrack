@@ -141,9 +141,9 @@ C:Register({"time", "timer"}, function(args)
 		KT:Msg("Usage: time [<seconds>s][<minutes>m][<hours>h]")
 		return
 	end
-	
+
 	local s, m, h
-	
+
 	if #args == 1 then
 		if not tonumber(args[1]) then
 			args[1] = args[1]:lower()
@@ -182,6 +182,10 @@ end)
 
 C:Register({"countmode", "cm", "count", "counttype", "changecount", "switchcount"}, function(args)
 	KT:ToggleCountMode()
+end)
+
+C:Register({"debug", "toggledebug", "d", "td"}, function(args)
+	KT:ToggleDebug()
 end)
 
 for i,v in ipairs(C.Slash) do

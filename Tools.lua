@@ -65,5 +65,5 @@ end
 -----------------
 
 function KTT:GUIDToID(guid)
-	return tonumber(guid:sub(-12, -9), 16)
+	return tonumber(guid:sub(6, 10), 16)
 end

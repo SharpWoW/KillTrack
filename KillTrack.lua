@@ -44,6 +44,7 @@ local DamageTrack = {}
 
 if KT.Version == "@" .. "project-version" .. "@" then
 	KT.Version = "Development"
+	KT.Debug = true
 end
 
 function KT:OnEvent(_, event, ...)
@@ -109,11 +110,24 @@ end
 
 function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 	if UnitIsPlayer("mouseover") then return end
-	if not UnitCanAttack("player", "mouseover") then return end
 	local id = KTT:GUIDToID(UnitGUID("mouseover"))
-	local gKills, cKills = self:GetKills(id)
-	GameTooltip:AddLine(("Killed %d (%d) times."):format(cKills, gKills), 1, 1, 1)
+	if UnitCanAttack("player", "mouseover") then
+		local gKills, cKills = self:GetKills(id)
+		GameTooltip:AddLine(("Killed %d (%d) times."):format(cKills, gKills), 1, 1, 1)
+	end
+	if KT.Debug then
+		GameTooltip:AddLine(("ID = %d"):format(id))
+	end
 	GameTooltip:Show()
+end
+
+function KT:ToggleDebug()
+	self.Debug = not self.Debug
+	if self.Debug then
+		KT:Msg("Debug enabled!")
+	else
+		KT:Msg("Debug disabled!")
+	end
 end
 
 function KT:IsInGroup(unit)
