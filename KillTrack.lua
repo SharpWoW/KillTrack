@@ -95,7 +95,9 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local name = tostring((select(9, ...)))
 	local lastDamage = DamageTrack[id] or "<No One>"
 	local pass
-	if self.Global.COUNT_GROUP then
+	if lastDamage == UnitName("pet") then
+		pass = true
+	elseif self.Global.COUNT_GROUP then
 		pass = self:IsInGroup(lastDamage)
 	else
 		pass = UnitName("player") == lastDamage
