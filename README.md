@@ -9,6 +9,8 @@ There is also a friendly list that you can bring up to display **all** mobs with
 Note that the list will only load 100 entries at a time due to lag issues.
 Loading more than 200 entries will most certainly cause severe lag.
 
+You can open the list with the command /kt list.
+
 Kill Timer
 ----------
 
@@ -24,7 +26,7 @@ When you've killed a certain mob a certain number of times (1000 by default), Ki
 
 If you have the AddOn Glamour installed, it will show in the style of a guild achievement.
 
-To change the threshold, use the command /kt threshold <threshold>, where <threshold> is the new threshold.
+To change the threshold, use the command /kt threshold \<threshold\>, where \<threshold\> is the new threshold.
 
 E.g: If you set the threshold to 100, then after you've killed a mob 100 times, it will notify you. And continue to notify you for every 100th kill.
 
