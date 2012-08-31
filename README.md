@@ -36,6 +36,11 @@ Feedback
 If you have any suggestions, bug reports, complains et.c, please make a new issue here on GitHub.  
 I would prefer if you use the Issues page here on GitHub instead of the ones on Curse/WoWInterface.
 
+Dependencies
+------------
+
+KillTrack depends on [AceGUI-3.0](http://www.wowace.com/addons/ace3/) (and therefore also [Libstub](http://www.wowace.com/addons/libstub/)) for creating its GUI elements.
+
 External links
 --------------
 
