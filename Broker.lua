@@ -26,17 +26,11 @@ KT.Broker = {
 	}
 }
 
+local KTT = KillTrack_Tools
 local KTB = KT.Broker
 
 local UPDATE = 1
 local t = 0
-
-local function FormatSeconds(seconds)
-	local hours = floor(seconds / 3600)
-	local minutes = floor(seconds / 60) - hours * 60
-	local seconds = seconds - minutes * 60 - hours * 3600
-	return ("%02d:%02d:%02d"):format(hours, minutes, seconds)
-end
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 
@@ -51,16 +45,25 @@ local data = {
 	tocname = KT.Name
 }
 
+local clickFunctions = {
+	ctrl = {
+		LeftButton = function() KT:Announce("GROUP") end, -- Announce to group/say
+		RightButton = function() KT:Announce("GUILD") end -- Announce to guild
+	},
+	none = {
+		LeftButton = function() KT.MobList:ShowGUI() end,
+		MiddleButton = function() KTB:ToggleTextMode() end,
+		RightButton = function() KT:ResetSession() end
+	}
+}
+
 local obj = ldb:NewDataObject("Broker_KillTrack", data)
-
--- Debug
-
 
 function obj:OnTooltipShow()
 	self:AddLine(("%s |cff00FF00(%s)|r"):format(KT.Name, KT.Version), 1, 1, 1)
 	self:AddLine(" ")
 	local _, kpm, kph, length = KT:GetSessionStats()
-	self:AddDoubleLine("Session Length", ("|cffFFFFFF%s|r"):format(FormatSeconds(length)))
+	self:AddDoubleLine("Session Length", ("|cffFFFFFF%s|r"):format(KTT:FormatSeconds(length)))
 	self:AddDoubleLine("Kills Per Minute", ("|cffFFFFFF%.2f|r"):format(kpm))
 	self:AddDoubleLine("Kills Per Hour", ("|cffFFFFFF%.2f|r"):format(kph))
 	self:AddLine(" ")
@@ -88,16 +91,15 @@ function obj:OnTooltipShow()
 	self:AddDoubleLine("Left Click", "Open mob database", 0, 1, 0, 0, 1, 0)
 	self:AddDoubleLine("Middle Click", "Toggle short/long text", 0, 1, 0, 0, 1, 0)
 	self:AddDoubleLine("Right Click", "Reset session statistics", 0, 1, 0, 0, 1, 0)
+	self:AddDoubleLine("Ctrl + Left Click", "Announce to group/say", 0, 1, 0, 0, 1, 0)
+	self:AddDoubleLine("Ctrl + Right Click", "Announce to guild", 0, 1, 0, 0, 1, 0)
 end
 
 function obj:OnClick(button)
-	if button == "LeftButton" then
-		KT.MobList:ShowGUI()
-	elseif button == "MiddleButton" then
-		KTB:ToggleTextMode()
-	elseif button == "RightButton" then
-		KT:ResetSession()
-	end
+	local mod = ((IsControlKeyDown() and "ctrl") or (IsShiftKeyDown() and "shift")) or "none"
+	if not clickFunctions[mod] then return end
+	local func = clickFunctions[mod][button]
+	if func then func() end
 end
 
 function obj:OnEnter()

@@ -22,6 +22,17 @@ KillTrack_Tools = {}
 local KTT = KillTrack_Tools
 
 ------------------
+-- NUMBER TOOLS --
+------------------
+
+function KTT:FormatSeconds(seconds)
+	local hours = floor(seconds / 3600)
+	local minutes = floor(seconds / 60) - hours * 60
+	local seconds = seconds - minutes * 60 - hours * 3600
+	return ("%02d:%02d:%02d"):format(hours, minutes, seconds)
+end
+
+------------------
 -- STRING TOOLS --
 ------------------
 

@@ -37,6 +37,9 @@ KillTrack = {
 	Session = {
 		Count = 0,
 		Kills = {}
+	},
+	Messages = {
+		Announce = "[KillTrack] Session Length: %s. Session Kills: %d. Kills Per Minute: %.2f."
 	}
 }
 
@@ -229,7 +232,7 @@ end
 function KT:ResetSession()
 	wipe(self.Session.Kills)
 	self.Session.Count = 0
-	self.Session.Start = time() / 60
+	self.Session.Start = time()
 end
 
 function KT:GetKills(id)
@@ -287,6 +290,15 @@ function KT:PrintKills(identifier)
 		end
 		self:Msg(("Unable to find %q in mob database."):format(tostring(identifier)))
 	end
+end
+
+function KT:Announce(target)
+	if target == "GROUP" then
+		target = ((IsInRaid() and "RAID") or (IsInGroup() and "PARTY")) or "SAY"
+	end
+	local _, kpm, _, length = self:GetSessionStats()
+	local msg = self.Messages.Announce:format(KTT:FormatSeconds(length), self.Session.Count, kpm)
+	SendChatMessage(msg, target)
 end
 
 function KT:Msg(msg)
