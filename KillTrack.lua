@@ -90,7 +90,7 @@ function KT.Events.ADDON_LOADED(self, ...)
 		self.CharGlobal.MOBS = {}
 	end
 	self:Msg("AddOn Loaded!")
-	self.Session.Start = time() / 60
+	self.Session.Start = time()
 	self.Broker:OnLoad()
 end
 
@@ -245,9 +245,22 @@ function KT:GetKills(id)
 	return gKills, cKills
 end
 
-function KT:GetKPM()
-	if not self.Session.Start then return 0 end
-	return self.Session.Count / (time() / 60 - self.Session.Start)
+function KT:GetTotalKills()
+	local count = 0
+	for k,v in pairs(self.Global.MOBS) do
+		count = count + v.Kills
+	end
+	return count
+end
+
+function KT:GetSessionStats()
+	if not self.Session.Start then return 0, 0, 0 end
+	local now = time()
+	local session = now - self.Session.Start
+	local kps = self.Session.Count / session
+	local kpm = kps * 60
+	local kph = kpm * 60
+	return kps, kpm, kph, session
 end
 
 function KT:PrintKills(identifier)

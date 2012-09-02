@@ -31,9 +31,18 @@ local KTB = KT.Broker
 local UPDATE = 1
 local t = 0
 
+local function FormatSeconds(seconds)
+	local hours = floor(seconds / 3600)
+	local minutes = floor(seconds / 60) - hours * 60
+	local seconds = seconds - minutes * 60 - hours * 3600
+	return ("%02d:%02d:%02d"):format(hours, minutes, seconds)
+end
+
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 
 local frame = CreateFrame("Frame")
+
+local tooltipVisible = false
 
 local data = {
 	type = "data source",
@@ -44,37 +53,44 @@ local data = {
 
 local obj = ldb:NewDataObject("Broker_KillTrack", data)
 
-function obj.OnTooltipShow(tip)
-	tip:AddLine(("%s |cff00FF00(%s)|r"):format(KT.Name, KT.Version), 1, 1, 1)
-	tip:AddLine(" ")
-	tip:AddLine("Most kills this session:", 1, 1, 0)
+-- Debug
+
+
+function obj:OnTooltipShow()
+	self:AddLine(("%s |cff00FF00(%s)|r"):format(KT.Name, KT.Version), 1, 1, 1)
+	self:AddLine(" ")
+	local _, kpm, kph, length = KT:GetSessionStats()
+	self:AddDoubleLine("Session Length", ("|cffFFFFFF%s|r"):format(FormatSeconds(length)))
+	self:AddDoubleLine("Kills Per Minute", ("|cffFFFFFF%.2f|r"):format(kpm))
+	self:AddDoubleLine("Kills Per Hour", ("|cffFFFFFF%.2f|r"):format(kph))
+	self:AddLine(" ")
+	self:AddDoubleLine("Kills this session", ("|cffFFFFFF%d|r"):format(KT.Session.Count), 1, 1, 0)
 	local added = 0
 	for i,v in pairs(KT:GetSortedSessionKills()) do
-		tip:AddDoubleLine(v.Name, v.Kills)
+		self:AddDoubleLine(v.Name, ("|cffFFFFFF%d|r"):format(v.Kills))
 		added = added + 1
 	end
 	if added <= 0 then
-		tip:AddLine("No kills this session", 1, 0, 0)
+		self:AddLine("No kills this session", 1, 0, 0)
 	end
-	tip:AddLine(" ")
-	tip:AddLine("Most kills total:", 1, 1, 0)
+	self:AddLine(" ")
+	self:AddDoubleLine("Kills in total", ("|cffFFFFFF%d|r"):format(KT:GetTotalKills()), 1, 1, 0)
 	local added = 0
 	for _,v in pairs(KT:GetSortedMobTable()) do
-		tip:AddDoubleLine(v.Name, ("%d (%d)"):format(v.cKills, v.gKills))
+		self:AddDoubleLine(v.Name, ("|cffFFFFFF%d (%d)|r"):format(v.cKills, v.gKills))
 		added = added + 1
 		if added >= 3 then break end
 	end
 	if added <= 0 then
-		tip:AddLine("No kills recorded yet", 1, 0, 0)
+		self:AddLine("No kills recorded yet", 1, 0, 0)
 	end
-	tip:AddLine(" ")
-	tip:AddDoubleLine("Left Click", "Open mob database", 0, 1, 0, 0, 1, 0)
-	tip:AddDoubleLine("Middle Click", "Toggle short/long text", 0, 1, 0, 0, 1, 0)
-	tip:AddDoubleLine("Right Click", "Reset session statistics", 0, 1, 0, 0, 1, 0)
-	tip:Show()
+	self:AddLine(" ")
+	self:AddDoubleLine("Left Click", "Open mob database", 0, 1, 0, 0, 1, 0)
+	self:AddDoubleLine("Middle Click", "Toggle short/long text", 0, 1, 0, 0, 1, 0)
+	self:AddDoubleLine("Right Click", "Reset session statistics", 0, 1, 0, 0, 1, 0)
 end
 
-function obj.OnClick(self, button)
+function obj:OnClick(button)
 	if button == "LeftButton" then
 		KT.MobList:ShowGUI()
 	elseif button == "MiddleButton" then
@@ -84,15 +100,34 @@ function obj.OnClick(self, button)
 	end
 end
 
+function obj:OnEnter()
+	GameTooltip:SetOwner(self, "ANCHOR_NONE")
+	GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+	KTB:UpdateTooltip()
+	tooltipVisible = true
+end
+
+function obj:OnLeave()
+	tooltipVisible = false
+	GameTooltip:Hide()
+end
+
 function KTB:UpdateText()
 	local text = KT.Global.BROKER.SHORT_TEXT and self.Text.Short or self.Text.Long
-	obj.text = text:format(KT:GetKPM())
+	obj.text = text:format(select(2, KT:GetSessionStats()))
+end
+
+function KTB:UpdateTooltip()
+	GameTooltip:ClearLines()
+	obj.OnTooltipShow(GameTooltip)
+	GameTooltip:Show()
 end
 
 function KTB:OnUpdate(frame, elapsed)
 	t = t + elapsed
 	if t >= UPDATE then
 		self:UpdateText()
+		if tooltipVisible then self:UpdateTooltip() end
 		t = 0
 	end
 end
