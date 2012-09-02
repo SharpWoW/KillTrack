@@ -33,6 +33,10 @@ KillTrack = {
 		AlphaA = 5,
 		IdDesc = 6,
 		IdAsc = 7
+	},
+	Session = {
+		Count = 0,
+		Kills = {}
 	}
 }
 
@@ -80,6 +84,7 @@ function KT.Events.ADDON_LOADED(self, ...)
 		self.CharGlobal.MOBS = {}
 	end
 	self:Msg("AddOn Loaded!")
+	self.Session.Start = time()
 end
 
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
@@ -172,6 +177,7 @@ function KT:AddKill(id, name)
 	if self.Global.PRINTKILLS then
 		self:Msg(("Updated %q, new kill count: %d. Kill count on this character: %d"):format(name, self.Global.MOBS[id].Kills, self.CharGlobal.MOBS[id].Kills))
 	end
+	self:AddSessionKill(name, self.Global.MOBS[id].Kills)
 	if type(self.Global.MOBS[id].AchievCount) ~= "number" then
 		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
 		if self.Global.MOBS[id].AchievCount >= 1 then
@@ -186,6 +192,21 @@ function KT:AddKill(id, name)
 	end
 end
 
+function KT:AddSessionKill(name, kills)
+	self.Session.Kills[name] = kills
+	table.sort(self.Session.Kills, function(a, b) return a > b end)
+	-- Trim table to only contain 3 entries
+	local trimmed = {}
+	local i = 0
+	for k,v in pairs(self.Session.Kills) do
+		trimmed[k] = v
+		i = i + 1
+		if i >= 3 then break end
+	end
+	self.Session.Kills = trimmed
+	self.Session.Count = self.Session.Count + 1
+end
+
 function KT:GetKills(id)
 	local gKills, cKills = 0, 0
 	for k,v in pairs(self.Global.MOBS) do
@@ -197,6 +218,11 @@ function KT:GetKills(id)
 		end
 	end
 	return gKills, cKills
+end
+
+function GetKPM()
+	if not self.Session.Start then return 0 end
+	return self.Session.Count / (time() - self.Session.Start)
 end
 
 function KT:PrintKills(identifier)
