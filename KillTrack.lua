@@ -205,17 +205,25 @@ function KT:AddSessionKill(name)
 	else
 		self.Session.Kills[name] = 1
 	end
-	table.sort(self.Session.Kills, function(a, b) return a > b end)
+	self.Session.Count = self.Session.Count + 1
+end
+
+function KT:GetSortedSessionKills(max)
+	max = tonumber(max) or 3
+	local t = {}
+	for k,v in pairs(self.Session.Kills) do
+		t[#t + 1] = {Name = k, Kills = v}
+	end
+	table.sort(t, function(a, b) return a.Kills > b.Kills end)
 	-- Trim table to only contain 3 entries
 	local trimmed = {}
-	local i = 0
-	for k,v in pairs(self.Session.Kills) do
-		trimmed[k] = v
-		i = i + 1
-		if i >= 3 then break end
+	local c = 0
+	for i,v in ipairs(t) do
+		trimmed[i] = v
+		c = c + 1
+		if c >= max then break end
 	end
-	self.Session.Kills = trimmed
-	self.Session.Count = self.Session.Count + 1
+	return trimmed
 end
 
 function KT:ResetSession()

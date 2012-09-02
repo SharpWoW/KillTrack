@@ -49,8 +49,8 @@ function obj.OnTooltipShow(tip)
 	tip:AddLine(" ")
 	tip:AddLine("Most kills this session:", 1, 1, 0)
 	local added = 0
-	for k,v in pairs(KT.Session.Kills) do
-		tip:AddDoubleLine(k, v)
+	for i,v in pairs(KT:GetSortedSessionKills()) do
+		tip:AddDoubleLine(v.Name, v.Kills)
 		added = added + 1
 	end
 	if added <= 0 then
