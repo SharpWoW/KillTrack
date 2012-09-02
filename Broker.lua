@@ -21,8 +21,8 @@ local KT = KillTrack
 
 KT.Broker = {
 	Text = {
-		Short = "KPM: %f",
-		Long = "Kills Per Minute: %f",
+		Short = "KPM: %.2f",
+		Long = "Kills Per Minute: %.2f"
 	}
 }
 
@@ -33,13 +33,56 @@ local t = 0
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 
+local frame = CreateFrame("Frame")
+
 local data = {
 	type = "data source",
-	label = "KillTrack |cff00FF00(" .. KT.Version .. ")|r",
-	icon = "Interface\\AddOns\\KillTrack\\icon.tga"
+	label = KT.Name,
+	icon = "Interface\\AddOns\\KillTrack\\icon.tga",
+	tocname = KT.Name
 }
 
 local obj = ldb:NewDataObject("Broker_KillTrack", data)
+
+function obj.OnTooltipShow(tip)
+	tip:AddLine(("%s |cff00FF00(%s)|r"):format(KT.Name, KT.Version), 1, 1, 1)
+	tip:AddLine(" ")
+	tip:AddLine("Most kills this session:", 1, 1, 0)
+	local added = 0
+	for k,v in pairs(KT.Session.Kills) do
+		tip:AddDoubleLine(k, v)
+		added = added + 1
+	end
+	if added <= 0 then
+		tip:AddLine("No kills this session", 1, 0, 0)
+	end
+	tip:AddLine(" ")
+	tip:AddLine("Most kills total:", 1, 1, 0)
+	local added = 0
+	for _,v in pairs(KT:GetSortedMobTable()) do
+		tip:AddDoubleLine(v.Name, ("%d (%d)"):format(v.cKills, v.gKills))
+		added = added + 1
+		if added >= 3 then break end
+	end
+	if added <= 0 then
+		tip:AddLine("No kills recorded yet", 1, 0, 0)
+	end
+	tip:AddLine(" ")
+	tip:AddDoubleLine("Left Click", "Open mob database", 0, 1, 0, 0, 1, 0)
+	tip:AddDoubleLine("Middle Click", "Toggle short/long text", 0, 1, 0, 0, 1, 0)
+	tip:AddDoubleLine("Right Click", "Reset session statistics", 0, 1, 0, 0, 1, 0)
+	tip:Show()
+end
+
+function obj.OnClick(self, button)
+	if button == "LeftButton" then
+		KT.MobList:ShowGUI()
+	elseif button == "MiddleButton" then
+		KTB:ToggleTextMode()
+	elseif button == "RightButton" then
+		KT:ResetSession()
+	end
+end
 
 function KTB:UpdateText()
 	local text = KT.Global.BROKER.SHORT_TEXT and self.Text.Short or self.Text.Long
@@ -55,13 +98,11 @@ function KTB:OnUpdate(frame, elapsed)
 end
 
 function KTB:ToggleTextMode()
-	if type(KT.Global.BROKER) ~= "table" then KT.Global.BROKER = {} end
 	KT.Global.BROKER.SHORT_TEXT = not KT.Global.BROKER.SHORT_TEXT
 	self:UpdateText()
 end
 
-local frame = CreateFrame("Frame")
-
-frame:SetScript("OnUpdate", function(self, elapsed) KTB:OnUpdate(self, elapsed) end)
-
-KTB:UpdateText()
+function KTB:OnLoad()
+	frame:SetScript("OnUpdate", function(self, elapsed) KTB:OnUpdate(self, elapsed) end)
+	self:UpdateText()
+end

@@ -79,12 +79,19 @@ function KT.Events.ADDON_LOADED(self, ...)
 	if type(_G["KILLTRACK_CHAR"]) ~= "table" then
 		_G["KILLTRACK_CHAR"] = {}
 	end
+	if type(KT.Global.BROKER) ~= "table" then
+		KT.Global.BROKER = {}
+	end
+	if type(KT.Global.BROKER.SHORT_TEXT) ~= "boolean" then
+		KT.Global.BROKER.SHORT_TEXT = false
+	end
 	self.CharGlobal = _G["KILLTRACK_CHAR"]
 	if type(self.CharGlobal.MOBS) ~= "table" then
 		self.CharGlobal.MOBS = {}
 	end
 	self:Msg("AddOn Loaded!")
-	self.Session.Start = time()
+	self.Session.Start = time() / 60
+	self.Broker:OnLoad()
 end
 
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
@@ -177,7 +184,7 @@ function KT:AddKill(id, name)
 	if self.Global.PRINTKILLS then
 		self:Msg(("Updated %q, new kill count: %d. Kill count on this character: %d"):format(name, self.Global.MOBS[id].Kills, self.CharGlobal.MOBS[id].Kills))
 	end
-	self:AddSessionKill(name, self.Global.MOBS[id].Kills)
+	self:AddSessionKill(name)
 	if type(self.Global.MOBS[id].AchievCount) ~= "number" then
 		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
 		if self.Global.MOBS[id].AchievCount >= 1 then
@@ -192,8 +199,12 @@ function KT:AddKill(id, name)
 	end
 end
 
-function KT:AddSessionKill(name, kills)
-	self.Session.Kills[name] = kills
+function KT:AddSessionKill(name)
+	if self.Session.Kills[name] then
+		self.Session.Kills[name] = self.Session.Kills[name] + 1
+	else
+		self.Session.Kills[name] = 1
+	end
 	table.sort(self.Session.Kills, function(a, b) return a > b end)
 	-- Trim table to only contain 3 entries
 	local trimmed = {}
@@ -205,6 +216,12 @@ function KT:AddSessionKill(name, kills)
 	end
 	self.Session.Kills = trimmed
 	self.Session.Count = self.Session.Count + 1
+end
+
+function KT:ResetSession()
+	wipe(self.Session.Kills)
+	self.Session.Count = 0
+	self.Session.Start = time() / 60
 end
 
 function KT:GetKills(id)
@@ -220,9 +237,9 @@ function KT:GetKills(id)
 	return gKills, cKills
 end
 
-function GetKPM()
+function KT:GetKPM()
 	if not self.Session.Start then return 0 end
-	return self.Session.Count / (time() - self.Session.Start)
+	return self.Session.Count / (time() / 60 - self.Session.Start)
 end
 
 function KT:PrintKills(identifier)
