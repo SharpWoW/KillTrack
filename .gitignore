@@ -1,4 +1,5 @@
-ss_*.png
+*.png
+*.zip
 /libs/LibStub
 /libs/CallbackHandler-1.0
 /libs/AceGUI-3.0
