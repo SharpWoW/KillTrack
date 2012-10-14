@@ -38,7 +38,7 @@ local function TimeCheck(_, _)
 	TimerData.Stop = T.Time.Stop
 	TimerData.Total = TimerData.Stop - TimerData.Start
 	TimerData.Left = TimerData.Total - TimerData.Current
-	TimerData.LeftFormat = FormatTime(TimerData.Left)
+	TimerData.LeftFormat = KTT:FormatSeconds(TimerData.Left)
 	TimerData.Progress = TimerData.Current / TimerData.Total
 	T:RunCallback(T:GetAllData(), T.State.UPDATE)
 	if now >= T.Time.Stop then T:Stop() end
