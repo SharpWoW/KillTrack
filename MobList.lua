@@ -134,12 +134,12 @@ function ML:Show()
 	if not created then
 		ML:Create()
 	end
-	if frame:IsShowing() then return end
+	if frame:IsShown() then return end
 	frame:Show()
 end
 
 function ML:Hide()
-	if not frame or not frame:IsShowing() then return end
+	if not frame or not frame:IsShown() then return end
 	frame:Hide()
 end
 
@@ -311,6 +311,10 @@ function ML:Create()
 	frame.statusLabel:SetText(STATUS_TEXT:format(1, limit, #Mobs))
 
 	self:UpdateEntries(LastOffset)
+
+	frame:SetScript("OnShow", function() ML:UpdateMobs() ML:UpdateEntries() end)
+
+	created = true
 end
 
 function ML:UpdateMobs(sort)
@@ -336,7 +340,7 @@ function ML:UpdateEntries(offset)
 		end
 		return
 	end
-	offset = tonumber(offset) or 0
+	offset = (tonumber(offset) or LastOffset) or 0
 	LastOffset = offset
 	local limit = ROW_COUNT
 	if limit > #Mobs then
