@@ -132,7 +132,7 @@ C:Register({"lookup", "lo", "check"}, function(args)
 end)
 
 C:Register({"list", "moblist", "mobs"}, function(args)
-	KT.MobList:ShowGUI()
+	KT.MobList:Show()
 end)
 
 C:Register({"time", "timer"}, function(args)

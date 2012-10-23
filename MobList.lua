@@ -17,6 +17,8 @@
 	* along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+-- Beware of some possibly messy code in this file
+
 local MAX_LOAD_INDEX = 200
 
 KillTrack.MobList = {
@@ -27,289 +29,338 @@ local KT = KillTrack
 local ML = KT.MobList
 
 local Sort = KT.Sort.Desc
+local Mobs = nil
+local LastOffset = 0
 
-local GUI = LibStub("AceGUI-3.0")
+-- Frame Constants
+local FRAME_WIDTH = 600
+local FRAME_HEIGHT = 534
+local HEADER_HEIGHT = 24
+local HEADER_LEFT = 3
+local HEADER_TOP = -60
+local ROW_HEIGHT = 15
+local ROW_COUNT = 28
+local ROW_TEXT_PADDING = 5
+local ROWS_HEIGHT = 450
+local ID_WIDTH = 100
+local NAME_WIDTH = 300
+local CHAR_WIDTH = 100
+local GLOBAL_WIDTH = 100
+local SCROLL_WIDTH = 27 -- Scrollbar width
+local STATUS_TEXT = "Showing entries %d through %d out of %d total"
 
-local frame, scrollHeader, idHeader, nameHeader, cKillsHeader, gKillsHeader, scrollContainer, scroll, loadButton
+local frame = nil
+local created = false
 
-local loadFrame = CreateFrame("Frame")
+-- Frame helper functions
 
-local index = 0
-local count = 1
+local function CreateHeader(parent)
+	local h = CreateFrame("Button", nil, parent)
+	h:SetHeight(HEADER_HEIGHT)
+	h:SetNormalFontObject("GameFontHighlightSmall")
 
-local function update(_, elapsed)
-	index = index + 1
-	ML:AddItem(index)
-	local c = floor((index)/100)
-	if c == count and index ~= MAX_LOAD_INDEX then
-		count = count + 1
-		--w = c/10
-		loadButton:SetDisabled(false)
-		loadFrame:SetScript("OnUpdate", nil)
-	elseif index >= MAX_LOAD_INDEX and not ML.LoadWarning then
-		StaticPopup_Show("KILLTRACK_LOADWARNING")
-		ML.LoadWarning = true
-		loadFrame:SetScript("OnUpdate", nil)
-	elseif index >= #KT.Temp.MobEntries then
-		index = 0
-		count = 1
-		ML.LoadWarning = false
-		frame:SetStatusText(("%d/%d mob entries loaded."):format(#KT.Temp.MobEntries, #KT.Temp.MobEntries))
-		loadButton:SetDisabled(true)
-		loadFrame:SetScript("OnUpdate", nil)
+	local bgl = h:CreateTexture(nil, "BACKGROUND")
+	bgl:SetTexture("Interface\\FriendsFrame\\WhoFrame-ColumnTabs")
+	bgl:SetWidth(5)
+	bgl:SetHeight(HEADER_HEIGHT)
+	bgl:SetPoint("TOPLEFT")
+	bgl:SetTexCoord(0, 0.07815, 0, 0.75)
+
+	local bgr = h:CreateTexture(nil, "BACKGROUND")
+	bgr:SetTexture("Interface\\FriendsFrame\\WhoFrame-ColumnTabs")
+	bgr:SetWidth(5)
+	bgr:SetHeight(HEADER_HEIGHT)
+	bgr:SetPoint("TOPRIGHT")
+	bgr:SetTexCoord(0.90625, 0.96875, 0, 0.75)
+
+	local bgm = h:CreateTexture(nil, "BACKGROUND")
+	bgm:SetTexture("Interface\\FriendsFrame\\WhoFrame-ColumnTabs")
+	bgm:SetHeight(HEADER_HEIGHT)
+	bgm:SetPoint("LEFT", bgl, "RIGHT")
+	bgm:SetPoint("RIGHT", bgr, "LEFT")
+	bgm:SetTexCoord(0.07815, 0.90625, 0, 0.75)
+
+	local hl = h:CreateTexture()
+	h:SetHighlightTexture("Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight", "ADD")
+	hl:SetPoint("TOPLEFT", bgl, "TOPLEFT", -2, 5)
+	hl:SetPoint("BOTTOMRIGHT", bgr, "BOTTOMRIGHT", 2, -7)
+
+	return h
+end
+
+local function CreateRow(container, previous)
+	local row = CreateFrame("Button", nil, container)
+	row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
+	row:SetHeight(ROW_HEIGHT)
+	row:SetPoint("LEFT")
+	row:SetPoint("RIGHT")
+	row:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 0)
+
+	row.idField = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+	row.idField:SetHeight(ROW_HEIGHT)
+	row.idField:SetWidth(ID_WIDTH - ROW_TEXT_PADDING * 2)
+	row.idField:SetPoint("LEFT", row, "LEFT", ROW_TEXT_PADDING, 0)
+	row.idField:SetJustifyH("RIGHT")
+
+	row.nameField = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+	row.nameField:SetHeight(ROW_HEIGHT)
+	row.nameField:SetWidth(NAME_WIDTH - SCROLL_WIDTH - ROW_TEXT_PADDING * 3)
+	row.nameField:SetPoint("LEFT", row.idField, "RIGHT", 2 * ROW_TEXT_PADDING, 0)
+	row.nameField:SetJustifyH("LEFT")
+
+	row.charKillField = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+	row.charKillField:SetHeight(ROW_HEIGHT)
+	row.charKillField:SetWidth(CHAR_WIDTH - ROW_TEXT_PADDING * 2)
+	row.charKillField:SetPoint("LEFT", row.nameField, "RIGHT", 2 * ROW_TEXT_PADDING, 0)
+	row.charKillField:SetJustifyH("RIGHT")
+
+	row.globalKillField = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+	row.globalKillField:SetHeight(ROW_HEIGHT)
+	row.globalKillField:SetWidth(GLOBAL_WIDTH - ROW_TEXT_PADDING * 2)
+	row.globalKillField:SetPoint("LEFT", row.charKillField, "RIGHT", 2 * ROW_TEXT_PADDING, 0)
+	row.globalKillField:SetJustifyH("RIGHT")
+
+	row:SetScript("OnClick", function(s)
+		local id = tonumber(s.idField:GetText())
+		if not id then return end
+		local name = s.nameField:GetText()
+		KT:ShowDelete(id, name)
+	end)
+
+	return row
+end
+
+function ML:Show()
+	if not created then
+		ML:Create()
 	end
+	if frame:IsShowing() then return end
+	frame:Show()
 end
 
-StaticPopupDialogs["KILLTRACK_LOADWARNING"] = {
-	text = "\124cffFF0000*** WARNING ***\124r\nLoading more than 200 entries may cause severe lag or client crashes.\nDo you want to continue?",
-	button1 = "Continue",
-	button2 = "Purge",
-	button3 = "Cancel",
-	OnAccept = function() count = count + 1 loadFrame:SetScript("OnUpdate", update) end,
-	OnCancel = function() index = 0 count = 1 ML.LoadWarning = false ML:HideGUI() KT:ShowPurge() end, -- This is actually button2, not 3
-	OnAlt = function() index = 0 end,
-	showAlert = true,
-	timeout = 0,
-	hideOnEscape = false,
-	whileDead = true
-}
-
-function ML:ShowGUI()
-	index = 0
-	count = 1
-
-	frame = GUI:Create("Frame")
-	frame:SetHeight(600)
-	frame:SetWidth(560)
-	frame:SetLayout("Flow")
-	frame:SetTitle("KillTrack - Mob List")
-	frame:SetCallback("OnRelease", function(frame)
-		index = 0
-		count = 1
-	end)
-	frame:SetCallback("OnClose", function(frame) frame:Release() end)
-
-	local loadHeader = GUI:Create("SimpleGroup")
-	loadHeader:SetFullWidth(true)
-	loadHeader:SetLayout("Flow")
-	loadButton = GUI:Create("Button")
-	loadButton:SetText("Load more entries")
-	loadButton:SetFullWidth(true)
-	loadButton:SetHeight(24)
-	loadButton:SetCallback("OnClick", function(button)
-		button:SetDisabled(true)
-		loadFrame:SetScript("OnUpdate", update)
-	end)
-	loadButton:SetDisabled(true)
-	loadHeader:AddChild(loadButton)
-
-	scrollHeader = GUI:Create("SimpleGroup")
-	scrollHeader:SetFullWidth(true)
-	scrollHeader:SetLayout("Flow")
-	idHeader = GUI:Create("InteractiveLabel")
-	idHeader:SetWidth(100)
-	idHeader:SetFont("Fonts\\FRIZQT__.TTF", 12)
-	idHeader:SetText("NPC ID")
-	idHeader:SetColor(1, 1, 0)
-	idHeader:SetHighlight(0.1, 0.1, 0.1)
-	idHeader:SetCallback("OnClick", function()
-		loadButton:SetDisabled(true)
-		index = 0
-		count = 1
-		ML.LoadWarning = false
-		if Sort == KT.Sort.IdAsc then
-			Sort = KT.Sort.IdDesc
-		else
-			Sort = KT.Sort.IdAsc
-		end
-		ML:UpdateList()
-	end)
-	nameHeader = GUI:Create("InteractiveLabel")
-	nameHeader:SetWidth(200)
-	nameHeader:SetFont("Fonts\\FRIZQT__.TTF", 12)
-	nameHeader:SetText("Name")
-	nameHeader:SetColor(1, 1, 0)
-	nameHeader:SetHighlight(0.1, 0.1, 0.1)
-	nameHeader:SetCallback("OnClick", function()
-		loadButton:SetDisabled(true)
-		index = 0
-		count = 1
-		ML.LoadWarning = false
-		if Sort == KT.Sort.AlphaA then
-			Sort = KT.Sort.AlphaD
-		else
-			Sort = KT.Sort.AlphaA
-		end
-		ML:UpdateList()
-	end)
-	cKillsHeader = GUI:Create("InteractiveLabel")
-	cKillsHeader:SetWidth(100)
-	cKillsHeader:SetFont("Fonts\\FRIZQT__.TTF", 12)
-	cKillsHeader:SetText("Character")
-	cKillsHeader:SetColor(1, 1, 0)
-	cKillsHeader:SetHighlight(0.1, 0.1, 0.1)
-	cKillsHeader:SetCallback("OnClick", function()
-		loadButton:SetDisabled(true)
-		index = 0
-		count = 1
-		ML.LoadWarning = false
-		if Sort == KT.Sort.CharDesc then
-			Sort = KT.Sort.CharAsc
-		else
-			Sort = KT.Sort.CharDesc
-		end
-		ML:UpdateList()
-	end)
-	gKillsHeader = GUI:Create("InteractiveLabel")
-	gKillsHeader:SetWidth(100)
-	gKillsHeader:SetFont("Fonts\\FRIZQT__.TTF", 12)
-	gKillsHeader:SetText("Global")
-	gKillsHeader:SetColor(1, 1, 0)
-	gKillsHeader:SetHighlight(0.1, 0.1, 0.1)
-	gKillsHeader:SetCallback("OnClick", function()
-		loadButton:SetDisabled(true)
-		index = 0
-		count = 1
-		ML.LoadWarning = false
-		if Sort == KT.Sort.Desc then
-			Sort = KT.Sort.Asc
-		else
-			Sort = KT.Sort.Desc
-		end
-		ML:UpdateList()
-	end)
-
-	scrollHeader:AddChild(idHeader)
-	scrollHeader:AddChild(nameHeader)
-	scrollHeader:AddChild(cKillsHeader)
-	scrollHeader:AddChild(gKillsHeader)
-
-	scrollContainer = GUI:Create("SimpleGroup")
-	scrollContainer:SetFullWidth(true)
-	scrollContainer:SetFullHeight(true)
-	scrollContainer:SetLayout("Fill")
-	scroll = GUI:Create("ScrollFrame")
-	scroll:SetLayout("List")
-
-	scrollContainer:AddChild(scroll)
-
-	frame:AddChild(loadHeader)
-	frame:AddChild(scrollHeader)
-	frame:AddChild(scrollContainer)
-
-	self:UpdateList()
+function ML:Hide()
+	if not frame or not frame:IsShowing() then return end
+	frame:Hide()
 end
 
-function ML:HideGUI()
-	frame:Release()
-end
-
-function ML:AddItem(index)
-	local entry = KT.Temp.MobEntries[index]
-	local container = GUI:Create("SimpleGroup")
-	container:SetFullWidth(true)
-	container:SetLayout("Flow")
-	local id = GUI:Create("InteractiveLabel")
-	id:SetWidth(100)
-	id:SetFont("Fonts\\FRIZQT__.TTF", 12)
-	id:SetText(tostring(entry.Id))
-	id:SetColor(1, 1, 1)
-	id:SetHighlight(0.1, 0.1, 0.1)
-	id:SetUserData("NPC_ID", entry.Id)
-	id:SetUserData("NPC_NAME", entry.Name)
-	id:SetCallback("OnClick", function(self)
-		KT:ShowDelete(self:GetUserData("NPC_ID"), self:GetUserData("NPC_NAME"))
-	end)
-	local name = GUI:Create("Label")
-	name:SetWidth(200)
-	name:SetFont("Fonts\\FRIZQT__.TTF", 12)
-	name:SetText(entry.Name)
-	name:SetColor(1, 1, 1)
-	local cKills = GUI:Create("Label")
-	cKills:SetWidth(100)
-	cKills:SetFont("Fonts\\FRIZQT__.TTF", 12)
-	cKills:SetText(entry.cKills)
-	cKills:SetColor(1, 1, 1)
-	local gKills = GUI:Create("Label")
-	gKills:SetWidth(100)
-	gKills:SetFont("Fonts\\FRIZQT__.TTF", 12)
-	gKills:SetText(entry.gKills)
-	gKills:SetColor(1, 1, 1)
-	container:AddChild(id)
-	container:AddChild(name)
-	container:AddChild(cKills)
-	container:AddChild(gKills)
-	scroll:AddChild(container)
-	frame:SetStatusText(("%d/%d mob entries loaded."):format(index, #KT.Temp.MobEntries))
-end
-
-function ML:UpdateList()
-	if Sort == KT.Sort.IdDesc or Sort == KT.Sort.IdAsc then
-		idHeader:SetColor(1, 0, 0)
-		nameHeader:SetColor(1, 1, 0)
-		cKillsHeader:SetColor(1, 1, 0)
-		gKillsHeader:SetColor(1, 1, 0)
-	elseif Sort == KT.Sort.AlphaD or Sort == KT.Sort.AlphaA then
-		idHeader:SetColor(1, 1, 0)
-		nameHeader:SetColor(1, 0, 0)
-		cKillsHeader:SetColor(1, 1, 0)
-		gKillsHeader:SetColor(1, 1, 0)
-	elseif Sort == KT.Sort.CharDesc or Sort == KT.Sort.CharAsc then
-		idHeader:SetColor(1, 1, 0)
-		nameHeader:SetColor(1, 1, 0)
-		cKillsHeader:SetColor(1, 0, 0)
-		gKillsHeader:SetColor(1, 1, 0)
+function ML:Toggle()
+	if frame and frame:IsShown() then
+		ML:Hide()
 	else
-		idHeader:SetColor(1, 1, 0)
-		nameHeader:SetColor(1, 1, 0)
-		cKillsHeader:SetColor(1, 1, 0)
-		gKillsHeader:SetColor(1, 0, 0)
+		ML:Show()
+	end
+end
+
+function ML:Create()
+	if frame then return end
+	frame = CreateFrame("Frame", nil, UIParent)
+	frame:Hide()
+	frame:SetToplevel(true)
+	frame:EnableMouse(true)
+	frame:SetMovable(true)
+	frame:SetPoint("CENTER")
+	frame:SetWidth(FRAME_WIDTH)
+	frame:SetHeight(FRAME_HEIGHT)
+
+	local bd = {
+		bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+		tile = true,
+		edgeSize = 16,
+		tileSize = 32,
+		insets = {
+			left = 2.5,
+			right = 2.5,
+			top = 2.5,
+			bottom = 2.5
+		}
+	}
+
+	frame:SetBackdrop(bd)
+
+	frame.titleLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.titleLabel:SetWidth(250)
+	frame.titleLabel:SetHeight(16)
+	frame.titleLabel:SetPoint("TOP", frame, "TOP", 0, -5)
+	frame.titleLabel:SetText("KillTrack Mob Database (" .. KT.Version .. ")")
+
+	frame:SetScript("OnMouseDown", function(s) s:StartMoving() end)
+	frame:SetScript("OnMouseUp", function(s) s:StopMovingOrSizing() end)
+	frame:SetScript("OnShow", function(s) ML:UpdateEntries() end)
+
+	frame.closeButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
+	frame.closeButton:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, -1)
+	frame.closeButton:SetScript("OnClick", function(s) ML:Hide() end)
+
+	frame.purgeButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	frame.purgeButton:SetHeight(24)
+	frame.purgeButton:SetWidth(100)
+	frame.purgeButton:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -5)
+	frame.purgeButton:SetText("Purge Data")
+	frame.purgeButton:SetScript("OnClick", function()
+		KT:ShowPurge()
+	end)
+
+	frame.resetButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	frame.resetButton:SetHeight(24)
+	frame.resetButton:SetWidth(100)
+	frame.resetButton:SetPoint("TOPLEFT", frame.purgeButton, "BOTTOMLEFT", 0, -3)
+	frame.resetButton:SetText("Reset All")
+	frame.resetButton:SetScript("OnClick", function()
+		KT:ShowReset()
+	end)
+
+	frame.helpLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.helpLabel:SetWidth(400)
+	frame.helpLabel:SetHeight(16)
+	frame.helpLabel:SetPoint("TOP", frame, "TOP", 0, -28)
+	frame.helpLabel:SetText("Click on an individual entry to delete it from the database")
+
+	frame.idHeader = CreateHeader(frame)
+	frame.idHeader:SetPoint("TOPLEFT", frame, "TOPLEFT", HEADER_LEFT, HEADER_TOP)
+	frame.idHeader:SetWidth(ID_WIDTH)
+	frame.idHeader:SetText("NPC ID")
+	frame.idHeader:SetScript("OnClick", function()
+		local sort = KT.Sort.IdAsc
+		if Sort == sort then
+			sort = KT.Sort.IdDesc
+		end
+		ML:UpdateMobs(sort)
+		ML:UpdateEntries(LastOffset)
+	end)
+
+	frame.nameHeader = CreateHeader(frame)
+	frame.nameHeader:SetPoint("TOPLEFT", frame.idHeader, "TOPRIGHT", -2, 0)
+	frame.nameHeader:SetWidth(NAME_WIDTH - SCROLL_WIDTH)
+	frame.nameHeader:SetText("Name")
+	frame.nameHeader:SetScript("OnClick", function()
+		local sort = KT.Sort.AlphaA
+		if Sort == sort then
+			sort = KT.Sort.AlphaD
+		end
+		ML:UpdateMobs(sort)
+		ML:UpdateEntries(LastOffset)
+	end)
+
+	frame.charKillHeader = CreateHeader(frame)
+	frame.charKillHeader:SetPoint("TOPLEFT", frame.nameHeader, "TOPRIGHT", -2, 0)
+	frame.charKillHeader:SetWidth(CHAR_WIDTH)
+	frame.charKillHeader:SetText("Character Kills")
+	frame.charKillHeader:SetScript("OnClick", function()
+		local sort = KT.Sort.CharDesc
+		if Sort == sort then
+			sort = KT.Sort.CharAsc
+		end
+		ML:UpdateMobs(sort)
+		ML:UpdateEntries(LastOffset)
+	end)
+
+	frame.globalKillHeader = CreateHeader(frame)
+	frame.globalKillHeader:SetPoint("TOPLEFT", frame.charKillHeader, "TOPRIGHT", -2, 0)
+	frame.globalKillHeader:SetWidth(GLOBAL_WIDTH + HEADER_LEFT)
+	frame.globalKillHeader:SetText("Global Kills")
+	frame.globalKillHeader:SetScript("OnClick", function()
+		local sort = KT.Sort.Desc
+		if Sort == sort then
+			sort = KT.Sort.Asc
+		end
+		ML:UpdateMobs(sort)
+		ML:UpdateEntries(LastOffset)
+	end)
+
+	frame.rows = CreateFrame("Frame", nil, frame)
+	frame.rows:SetPoint("LEFT")
+	frame.rows:SetPoint("RIGHT", frame, "RIGHT", -SCROLL_WIDTH, 0)
+	frame.rows:SetPoint("TOP", frame.idHeader, "BOTTOM", 0, 0)
+	frame.rows:SetPoint("BOTTOM", frame, "BOTTOM", 0, 0)
+	frame.rows:SetPoint("TOPLEFT", frame.idHeader, "BOTTOMLEFT", 0, 0)
+
+	local previous = frame.idHeader
+	for i = 1, ROW_COUNT do
+		frame.rows["row" .. i] = CreateRow(frame.rows, previous)
+		frame.rows["row" .. i].idField:SetText("")
+		frame.rows["row" .. i].nameField:SetText("")
+		frame.rows["row" .. i].charKillField:SetText("")
+		frame.rows["row" .. i].globalKillField:SetText("")
+		previous = frame.rows["row" .. i]
 	end
 
-	scroll:ReleaseChildren()
+	frame.rows.scroller = CreateFrame("ScrollFrame", "KillTrackMobListScrollFrame", frame.rows, "FauxScrollFrameTemplateLight")
+	frame.rows.scroller:SetWidth(frame.rows:GetWidth())
+	frame.rows.scroller:SetPoint("TOPRIGHT", frame.rows, "TOPRIGHT", -1, -2)
+	frame.rows.scroller:SetPoint("BOTTOMRIGHT", 0, 4)
+	frame.rows.scroller:SetScript(
+		"OnVerticalScroll",
+		function(s, val)
+			FauxScrollFrame_OnVerticalScroll(
+				s, val, ROW_HEIGHT,
+				function()
+					local offset = FauxScrollFrame_GetOffset(KillTrackMobListScrollFrame)
+					ML:UpdateEntries(offset)
+				end
+			)
+		end
+	)
 
-	KT.Temp.MobEntries = KT:GetSortedMobTable(Sort)
+	self:UpdateMobs(Sort)
 
-	loadFrame:SetScript("OnUpdate", update)
+	frame.statusLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.statusLabel:SetWidth(400)
+	frame.statusLabel:SetHeight(16)
+	frame.statusLabel:SetPoint("BOTTOM", frame, "BOTTOM", 0, 12)
+	frame.statusLabel:SetText(STATUS_TEXT:format(1, limit, #Mobs))
 
-	--[[
-	local entries = KT:GetSortedMobTable(Sort)
+	self:UpdateEntries(LastOffset)
+end
 
-	for i,v in ipairs(entries) do
-		local container = GUI:Create("SimpleGroup")
-		container:SetFullWidth(true)
-		container:SetLayout("Flow")
-		local id = GUI:Create("InteractiveLabel")
-		id:SetWidth(100)
-		id:SetFont("Fonts\\FRIZQT__.TTF", 12)
-		id:SetText(tostring(v.Id))
-		id:SetColor(1, 1, 1)
-		id:SetHighlight(0.1, 0.1, 0.1)
-		id:SetUserData("NPC_ID", v.Id)
-		id:SetUserData("NPC_NAME", v.Name)
-		id:SetCallback("OnClick", function(self)
-			KT:ShowDelete(self:GetUserData("NPC_ID"), self:GetUserData("NPC_NAME"))
-		end)
-		local name = GUI:Create("Label")
-		name:SetWidth(200)
-		name:SetFont("Fonts\\FRIZQT__.TTF", 12)
-		name:SetText(v.Name)
-		name:SetColor(1, 1, 1)
-		local cKills = GUI:Create("Label")
-		cKills:SetWidth(100)
-		cKills:SetFont("Fonts\\FRIZQT__.TTF", 12)
-		cKills:SetText(v.cKills)
-		cKills:SetColor(1, 1, 1)
-		local gKills = GUI:Create("Label")
-		gKills:SetWidth(100)
-		gKills:SetFont("FRIZQT__.TTF", 12)
-		gKills:SetText(v.gKills)
-		gKills:SetColor(1, 1, 1)
-		container:AddChild(id)
-		container:AddChild(name)
-		container:AddChild(cKills)
-		container:AddChild(gKills)
-		scroll:AddChild(container)
+function ML:UpdateMobs(sort)
+	sort = (sort or Sort) or KT.Sort.Desc
+	if Mobs and sort == Sort then return end -- No update needed
+	Sort = sort
+	Mobs = KT:GetSortedMobTable(Sort)
+	FauxScrollFrame_Update(KillTrackMobListScrollFrame, #Mobs, ROW_COUNT, ROW_HEIGHT)
+end
+
+function ML:UpdateEntries(offset)
+	if (#Mobs <= 0) then
+		for i = 1, ROW_COUNT do
+			local row = frame.rows["row" .. i]
+			row.idField:SetText("")
+			if i == 1 then
+				row.nameField:SetText("No entries in database!")
+			else
+				row.nameField:SetText("")
+			end
+			row.charKillField:SetText("")
+			row.globalKillField:SetText("")
+		end
+		return
 	end
-	--]]
+	offset = tonumber(offset) or 0
+	LastOffset = offset
+	local limit = ROW_COUNT
+	if limit > #Mobs then
+		limit = #Mobs
+	end
+	for i = 1, limit do
+		local row = frame.rows["row" .. i]
+		local mob = Mobs[i + offset]
+		row.idField:SetText(mob.Id)
+		row.nameField:SetText(mob.Name)
+		row.charKillField:SetText(mob.cKills)
+		row.globalKillField:SetText(mob.gKills)
+	end
+	frame.statusLabel:SetText(STATUS_TEXT:format(1 + offset, offset + ROW_COUNT, #Mobs))
+
+	if offset == 0 then
+		KillTrackMobListScrollFrameScrollBarScrollUpButton:Disable()
+	else
+		KillTrackMobListScrollFrameScrollBarScrollUpButton:Enable()
+	end
+
+	if offset + ROW_COUNT == #Mobs then
+		KillTrackMobListScrollFrameScrollBarScrollDownButton:Disable()
+	else
+		KillTrackMobListScrollFrameScrollBarScrollDownButton:Enable()
+	end
 end

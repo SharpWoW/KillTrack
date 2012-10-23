@@ -51,7 +51,7 @@ local clickFunctions = {
 		RightButton = function() KT:Announce("GUILD") end -- Announce to guild
 	},
 	none = {
-		LeftButton = function() KT.MobList:ShowGUI() end,
+		LeftButton = function() KT.MobList:Toggle() end,
 		MiddleButton = function() KTB:ToggleTextMode() end,
 		RightButton = function() KT:ResetSession() end
 	}
