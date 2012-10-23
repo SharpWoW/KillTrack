@@ -186,7 +186,7 @@ function ML:Create()
 
 	frame:SetScript("OnMouseDown", function(s) s:StartMoving() end)
 	frame:SetScript("OnMouseUp", function(s) s:StopMovingOrSizing() end)
-	frame:SetScript("OnShow", function(s) ML:UpdateEntries() end)
+	frame:SetScript("OnShow", function() ML:UpdateMobs() ML:UpdateEntries() end)
 
 	frame.closeButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
 	frame.closeButton:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, -1)
@@ -311,8 +311,6 @@ function ML:Create()
 	frame.statusLabel:SetText(STATUS_TEXT:format(1, limit, #Mobs))
 
 	self:UpdateEntries(LastOffset)
-
-	frame:SetScript("OnShow", function() ML:UpdateMobs() ML:UpdateEntries() end)
 
 	created = true
 end
