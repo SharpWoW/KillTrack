@@ -9,7 +9,6 @@
 #@no-lib-strip@
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
-libs\AceGUI-3.0\AceGUI-3.0.xml
 #@end-no-lib-strip@
 libs\LibDataBroker-1-1\LibDataBroker-1.1.lua
 
