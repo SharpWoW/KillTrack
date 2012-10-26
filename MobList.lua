@@ -27,19 +27,22 @@ KillTrack.MobList = {
 
 local KT = KillTrack
 local ML = KT.MobList
+local KTT = KillTrack_Tools
 
 local Sort = KT.Sort.Desc
 local Mobs = nil
+local LastFilter = nil
 local LastOffset = 0
+local TotalMobs = 0
 
 -- Frame Constants
 local FRAME_WIDTH = 600
 local FRAME_HEIGHT = 534
 local HEADER_HEIGHT = 24
 local HEADER_LEFT = 3
-local HEADER_TOP = -60
+local HEADER_TOP = -80
 local ROW_HEIGHT = 15
-local ROW_COUNT = 28
+local ROW_COUNT = 27
 local ROW_TEXT_PADDING = 5
 local ROWS_HEIGHT = 450
 local ID_WIDTH = 100
@@ -47,7 +50,7 @@ local NAME_WIDTH = 300
 local CHAR_WIDTH = 100
 local GLOBAL_WIDTH = 100
 local SCROLL_WIDTH = 27 -- Scrollbar width
-local STATUS_TEXT = "Showing entries %d through %d out of %d total"
+local STATUS_TEXT = "Showing entries %d through %d out of %d total (%d hidden)"
 
 local frame = nil
 local created = false
@@ -186,7 +189,7 @@ function ML:Create()
 
 	frame:SetScript("OnMouseDown", function(s) s:StartMoving() end)
 	frame:SetScript("OnMouseUp", function(s) s:StopMovingOrSizing() end)
-	frame:SetScript("OnShow", function() ML:UpdateMobs() ML:UpdateEntries() end)
+	frame:SetScript("OnShow", function() ML:UpdateMobs(Sort, LastFilter) ML:UpdateEntries(LastOffset) end)
 
 	frame.closeButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
 	frame.closeButton:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, -1)
@@ -211,10 +214,44 @@ function ML:Create()
 	end)
 
 	frame.helpLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	frame.helpLabel:SetWidth(400)
+	frame.helpLabel:SetWidth(380)
 	frame.helpLabel:SetHeight(16)
 	frame.helpLabel:SetPoint("TOP", frame, "TOP", 0, -28)
-	frame.helpLabel:SetText("Click on an individual entry to delete it from the database")
+	frame.helpLabel:SetWordWrap(true)
+	frame.helpLabel:SetMaxLines(2)
+	frame.helpLabel:SetText("Click on an individual entry to delete it from the database. Use the search to filter database by name.")
+
+	frame.searchBox = CreateFrame("EditBox", "KillTrackMobListSearchBox", frame, "SearchBoxTemplate")
+	frame.searchBox:SetWidth(200)
+	frame.searchBox:SetHeight(16)
+	frame.searchBox:SetPoint("TOPLEFT", frame.resetButton, "BOTTOMLEFT", 8, -3)
+	frame.searchBox:SetScript("OnTextChanged", function(s, c)
+		local text = s:GetText()
+		if (not _G[s:GetName() .. "ClearButton"]:IsShown()) then
+			text = nil
+			LastFilter = nil
+		end
+		if not text or text == "" then
+			ML:UpdateMobs(Sort)
+		else
+			ML:UpdateMobs(Sort, text)
+		end
+		ML:UpdateEntries(LastOffset)
+	end)
+	frame.searchBox:SetScript("OnEnterPressed", function(s) s:ClearFocus() end)
+	local sBoxOldFunc = KillTrackMobListSearchBoxClearButton:GetScript("OnHide")
+	KillTrackMobListSearchBoxClearButton:SetScript("OnHide", function(s)
+		if sBoxOldFunc then sBoxOldFunc(s) end
+		if not frame:IsShown() then return end
+		ML:UpdateMobs(Sort, nil)
+		ML:UpdateEntries(LastOffset)
+	end)
+
+	frame.searchTipLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.searchTipLabel:SetWidth(200)
+	frame.searchTipLabel:SetHeight(16)
+	frame.searchTipLabel:SetPoint("LEFT", frame.searchBox, "RIGHT", -22, 0)
+	frame.searchTipLabel:SetText("(Supports Lua patterns)")
 
 	frame.idHeader = CreateHeader(frame)
 	frame.idHeader:SetPoint("TOPLEFT", frame, "TOPLEFT", HEADER_LEFT, HEADER_TOP)
@@ -225,7 +262,7 @@ function ML:Create()
 		if Sort == sort then
 			sort = KT.Sort.IdDesc
 		end
-		ML:UpdateMobs(sort)
+		ML:UpdateMobs(sort, LastFilter)
 		ML:UpdateEntries(LastOffset)
 	end)
 
@@ -238,7 +275,7 @@ function ML:Create()
 		if Sort == sort then
 			sort = KT.Sort.AlphaD
 		end
-		ML:UpdateMobs(sort)
+		ML:UpdateMobs(sort, LastFilter)
 		ML:UpdateEntries(LastOffset)
 	end)
 
@@ -251,7 +288,7 @@ function ML:Create()
 		if Sort == sort then
 			sort = KT.Sort.CharAsc
 		end
-		ML:UpdateMobs(sort)
+		ML:UpdateMobs(sort, LastFilter)
 		ML:UpdateEntries(LastOffset)
 	end)
 
@@ -264,7 +301,7 @@ function ML:Create()
 		if Sort == sort then
 			sort = KT.Sort.Asc
 		end
-		ML:UpdateMobs(sort)
+		ML:UpdateMobs(sort, LastFilter)
 		ML:UpdateEntries(LastOffset)
 	end)
 
@@ -273,7 +310,7 @@ function ML:Create()
 	frame.rows:SetPoint("RIGHT", frame, "RIGHT", -SCROLL_WIDTH, 0)
 	frame.rows:SetPoint("TOP", frame.idHeader, "BOTTOM", 0, 0)
 	frame.rows:SetPoint("BOTTOM", frame, "BOTTOM", 0, 0)
-	frame.rows:SetPoint("TOPLEFT", frame.idHeader, "BOTTOMLEFT", 0, 0)
+	frame.rows:SetPoint("TOPLEFT", frame.idHeader, "BOTTOMLEFT", 0, 30)
 
 	local previous = frame.idHeader
 	for i = 1, ROW_COUNT do
@@ -305,9 +342,9 @@ function ML:Create()
 	self:UpdateMobs(Sort)
 
 	frame.statusLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	frame.statusLabel:SetWidth(400)
+	frame.statusLabel:SetWidth(420)
 	frame.statusLabel:SetHeight(16)
-	frame.statusLabel:SetPoint("BOTTOM", frame, "BOTTOM", 0, 12)
+	frame.statusLabel:SetPoint("BOTTOM", frame, "BOTTOM", 0, 8)
 	frame.statusLabel:SetText(STATUS_TEXT:format(1, limit, #Mobs))
 
 	self:UpdateEntries(LastOffset)
@@ -315,11 +352,12 @@ function ML:Create()
 	created = true
 end
 
-function ML:UpdateMobs(sort)
+function ML:UpdateMobs(sort, filter)
 	sort = (sort or Sort) or KT.Sort.Desc
-	if Mobs and sort == Sort then return end -- No update needed
+	if Mobs and sort == Sort and filter == LastFilter then return end -- No update needed
 	Sort = sort
-	Mobs = KT:GetSortedMobTable(Sort)
+	LastFilter = filter
+	Mobs = KT:GetSortedMobTable(Sort, filter and filter:lower() or nil)
 	FauxScrollFrame_Update(KillTrackMobListScrollFrame, #Mobs, ROW_COUNT, ROW_HEIGHT)
 end
 
@@ -329,14 +367,27 @@ function ML:UpdateEntries(offset)
 			local row = frame.rows["row" .. i]
 			row.idField:SetText("")
 			if i == 1 then
-				row.nameField:SetText("No entries in database!")
+				row.nameField:SetText("No entries in database or none matched search!")
 			else
 				row.nameField:SetText("")
 			end
 			row.charKillField:SetText("")
 			row.globalKillField:SetText("")
+			row:Disable()
 		end
+
+		frame.statusLabel:SetText(STATUS_TEXT:format(0, 0, 0))
+
 		return
+	elseif #Mobs < ROW_COUNT then
+		for i = 1, ROW_COUNT do
+			local row = frame.rows["row" .. i]
+			row.idField:SetText("")
+			row.nameField:SetText("")
+			row.charKillField:SetText("")
+			row.globalKillField:SetText("")
+			row:Disable()
+		end
 	end
 	offset = (tonumber(offset) or LastOffset) or 0
 	LastOffset = offset
@@ -351,8 +402,10 @@ function ML:UpdateEntries(offset)
 		row.nameField:SetText(mob.Name)
 		row.charKillField:SetText(mob.cKills)
 		row.globalKillField:SetText(mob.gKills)
+		row:Enable()
 	end
-	frame.statusLabel:SetText(STATUS_TEXT:format(1 + offset, offset + ROW_COUNT, #Mobs))
+
+	frame.statusLabel:SetText(STATUS_TEXT:format(1 + offset, math.min(#Mobs, offset + ROW_COUNT), #Mobs, KTT:TableLength(KT.Global.MOBS) - #Mobs))
 
 	if offset == 0 then
 		KillTrackMobListScrollFrameScrollBarScrollUpButton:Disable()

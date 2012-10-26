@@ -335,16 +335,25 @@ function KT:GetMob(id)
 	return false, nil
 end
 
-function KT:GetSortedMobTable(mode)
+function KT:GetSortedMobTable(mode, filter, caseSensitive)
 	if not tonumber(mode) then mode = self.Sort.Desc end
 	if mode < 0 or mode > 7 then mode = self.Sort.Desc end
+	if filter and filter == "" then filter = nil end
 	local t = {}
 	for k,v in pairs(self.Global.MOBS) do
-		local cKills = 0
-		if self.CharGlobal.MOBS[k] and type(self.CharGlobal.MOBS[k]) == "table" then
-			cKills = self.CharGlobal.MOBS[k].Kills
+		assert(type(v) == "table", "Unexpected mob entry type in db: " .. type(v) .. ". Expected table")
+		local matches = nil
+		if filter then
+			local name = caseSensitive and v.Name or v.Name:lower()
+			filter = caseSensitive and filter or filter:lower()
+			local status, result = pcall(string.match, name, filter)
+			matches = status and result
 		end
-		if type(v) == "table" then
+		if matches or not filter then
+			local cKills = 0
+			if self.CharGlobal.MOBS[k] and type(self.CharGlobal.MOBS[k]) == "table" then
+				cKills = self.CharGlobal.MOBS[k].Kills
+			end
 			local entry = {Id = k, Name = v.Name, gKills = v.Kills, cKills = cKills}
 			table.insert(t, entry)
 		end
