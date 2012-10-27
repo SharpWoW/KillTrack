@@ -47,13 +47,14 @@ local KT = KillTrack
 
 local KTT = KillTrack_Tools
 
-local DamageTrack = {}
-local DamageValid = {}
+local DamageTrack = {} -- Tracks first damage to a mob registered by CLEU
+local DamageValid = {} -- Determines if mob is tapped by player/group
 
 local Units = {
 	"target",
 	"focus",
-	"pet"
+	"pet",
+	"mouseover"
 }
 
 for i = 1, 40 do
@@ -126,35 +127,57 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 		local s_name = tostring((select(5, ...)))
 		local guid = (select(8, ...))
 		--local t_id = tonumber(KTT:GUIDToID((select(8, ...))))
-		DamageTrack[guid] = s_name
-		if not DamageValid[guid] then
-			local unit = FindUnitByGUID(guid)
-			if unit and UnitIsTappedByPlayer(unit) then
-				DamageValid[guid] = s_name == UnitName("player") or s_name == UnitName("pet") or (self.Global.COUNT_GROUP and self:IsInGroup(s_name))
-			end
+		if DamageTrack[guid] == nil then
+			-- s_name is (probably) the player who first damaged this mob and probably has the tag
+			DamageTrack[guid] = s_name
 		end
+
+		if DamageValid[guid] == nil then
+			-- if DamageValid returns true for a GUID, we can tell with 100% certainty that it's valid
+			-- But this relies on one of the valid unit names currently being the damaged mob
+			-- Or if it's false, we can tell with 100% certainty that someone else tagged the mob
+
+			local unit = FindUnitByGUID(guid)
+
+			if not unit then return end
+
+			local tapped = UnitIsTapped(unit)
+
+			if not tapped then return end
+
+			if tapped and UnitIsTappedByPlayer(unit) then
+				DamageValid[guid] = true
+			else
+				DamageValid[guid] = false
+			end
+			--if unit and UnitIsTappedByPlayer(unit) then
+			--	DamageValid[guid] = s_name == UnitName("player") or s_name == UnitName("pet") or (self.Global.COUNT_GROUP and self:IsInGroup(s_name))
+			--end
+		end
+
+		return
 	end
+
 	if event ~= "UNIT_DIED" then return end
 	-- Perform solo/group checks
 	local guid = (select(8, ...))
 	local id = KTT:GUIDToID(guid)
 	local name = tostring((select(9, ...)))
-	local lastDamage = DamageTrack[guid] or "<No One>"
+	local firstDamage = DamageTrack[guid] or "<No One>"
 	local pass
+
 	-- All checks after DamageValid should be safe to remove
 	-- The checks after DamageValid are also not 100% failsafe
 	-- Scenario: You deal the killing blow to an already tapped mob <- Would count as kill with current code
-	if DamageValid[guid] then
-		pass = true
-	elseif lastDamage == UnitName("pet") then
-		pass = true
-	elseif self.Global.COUNT_GROUP then
-		pass = self:IsInGroup(lastDamage)
-	else
-		pass = UnitName("player") == lastDamage
+
+	-- if DamageValid[guid] is set, it can be used to decide if the kill was valid with 100% certainty
+	if DamageValid[guid] ~= nil then
+		pass = DamageValid[guid]
+	else -- The one who dealt the very first bit of damage was probably the one who got the tag on the mob
+		-- This should apply in most (if not all) situations and is probably a safe fallback when we couldn't retrieve tapped status from GUID->Unit
+		pass = firstDamage == UnitName("player") or firstDamage == UnitName("pet") or (self.Global.COUNT_GROUP and self:IsInGroup(firstDamage))
 	end
-	if not pass then return end
-	if id == 0 then return end
+	if not pass or id == 0 then return end
 	DamageTrack[guid] = nil
 	DamageValid[guid] = nil
 	self:AddKill(id, name)
