@@ -48,10 +48,33 @@ local KT = KillTrack
 local KTT = KillTrack_Tools
 
 local DamageTrack = {}
+local DamageValid = {}
+
+local Units = {
+	"target",
+	"focus",
+	"pet"
+}
+
+for i = 1, 40 do
+	if i <= 5 then Units[#Units + 1] = "party" .. i end
+	Units[#Units + 1] = "raid" .. i
+end
+
+for i = 1, #Units * 2 do
+	Units[#Units + 1] = Units[i] .. "target"
+end
 
 if KT.Version == "@" .. "project-version" .. "@" then
 	KT.Version = "Development"
 	KT.Debug = true
+end
+
+local function FindUnitByGUID(guid)
+	for i = 1, #Units do
+		if UnitGUID(Units[i]) == guid then return Units[i] end
+	end
+	return nil
 end
 
 function KT:OnEvent(_, event, ...)
@@ -101,16 +124,29 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local event = (select(2, ...))
 	if event == "SWING_DAMAGE" or event == "RANGE_DAMAGE" or event == "SPELL_DAMAGE" then
 		local s_name = tostring((select(5, ...)))
-		local t_id = tonumber(KTT:GUIDToID((select(8, ...))))
-		DamageTrack[t_id] = s_name
+		local guid = (select(8, ...))
+		--local t_id = tonumber(KTT:GUIDToID((select(8, ...))))
+		DamageTrack[guid] = s_name
+		if not DamageValid[guid] then
+			local unit = FindUnitByGUID(guid)
+			if unit and UnitIsTappedByPlayer(unit) then
+				DamageValid[guid] = s_name == UnitName("player") or s_name == UnitName("pet") or (self.Global.COUNT_GROUP and self:IsInGroup(s_name))
+			end
+		end
 	end
 	if event ~= "UNIT_DIED" then return end
 	-- Perform solo/group checks
-	local id = KTT:GUIDToID((select(8, ...)))
+	local guid = (select(8, ...))
+	local id = KTT:GUIDToID(guid)
 	local name = tostring((select(9, ...)))
-	local lastDamage = DamageTrack[id] or "<No One>"
+	local lastDamage = DamageTrack[guid] or "<No One>"
 	local pass
-	if lastDamage == UnitName("pet") then
+	-- All checks after DamageValid should be safe to remove
+	-- The checks after DamageValid are also not 100% failsafe
+	-- Scenario: You deal the killing blow to an already tapped mob <- Would count as kill with current code
+	if DamageValid[guid] then
+		pass = true
+	elseif lastDamage == UnitName("pet") then
 		pass = true
 	elseif self.Global.COUNT_GROUP then
 		pass = self:IsInGroup(lastDamage)
@@ -119,6 +155,8 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	end
 	if not pass then return end
 	if id == 0 then return end
+	DamageTrack[guid] = nil
+	DamageValid[guid] = nil
 	self:AddKill(id, name)
 	if self.Timer:IsRunning() then
 		self.Timer:SetData("Kills", self.Timer:GetData("Kills", true) + 1)
