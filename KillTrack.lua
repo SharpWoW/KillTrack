@@ -47,19 +47,27 @@ local KT = KillTrack
 
 local KTT = KillTrack_Tools
 
-local DamageTrack = {} -- Tracks first damage to a mob registered by CLEU
+local FirstDamage = {} -- Tracks first damage to a mob registered by CLEU
+local LastDamage = {} -- Tracks whoever did the most recent damage to a mob
 local DamageValid = {} -- Determines if mob is tapped by player/group
 
 local Units = {
 	"target",
+	"targetpet",
 	"focus",
+	"focuspet",
 	"pet",
-	"mouseover"
+	"mouseover",
+	"mouseoverpet",
 }
 
 for i = 1, 40 do
-	if i <= 5 then Units[#Units + 1] = "party" .. i end
+	if i <= 4 then
+		Units[#Units + 1] = "party" .. i
+		Units[#Units + 1] = "partypet" .. i
+	end
 	Units[#Units + 1] = "raid" .. i
+	Units[#Units + 1] = "raidpet" .. i
 end
 
 for i = 1, #Units * 2 do
@@ -127,10 +135,12 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 		local s_name = tostring((select(5, ...)))
 		local guid = (select(8, ...))
 		--local t_id = tonumber(KTT:GUIDToID((select(8, ...))))
-		if DamageTrack[guid] == nil then
+		if FirstDamage[guid] == nil then
 			-- s_name is (probably) the player who first damaged this mob and probably has the tag
-			DamageTrack[guid] = s_name
+			FirstDamage[guid] = s_name
 		end
+
+		LastDamage[guid] = s_name
 
 		if DamageValid[guid] == nil then
 			-- if DamageValid returns true for a GUID, we can tell with 100% certainty that it's valid
@@ -145,14 +155,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 
 			if not tapped then return end
 
-			if tapped and UnitIsTappedByPlayer(unit) then
-				DamageValid[guid] = true
-			else
-				DamageValid[guid] = false
-			end
-			--if unit and UnitIsTappedByPlayer(unit) then
-			--	DamageValid[guid] = s_name == UnitName("player") or s_name == UnitName("pet") or (self.Global.COUNT_GROUP and self:IsInGroup(s_name))
-			--end
+			DamageValid[guid] = tapped and UnitIsTappedByPlayer(unit)
 		end
 
 		return
@@ -163,7 +166,11 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local guid = (select(8, ...))
 	local id = KTT:GUIDToID(guid)
 	local name = tostring((select(9, ...)))
-	local firstDamage = DamageTrack[guid] or "<No One>"
+	local firstDamage = FirstDamage[guid] or "<No One>"
+	local lastDamage = LastDamage[guid] or "<No One>"
+	local firstByPlayer = firstDamage == UnitName("player") or firstDamage == UnitName("pet")
+	local firstByGroup = self:IsInGroup(firstDamage)
+	local lastByPlayer = lastDamage == UnitName("player") or lastDamage == UnitName("pet")
 	local pass
 
 	-- All checks after DamageValid should be safe to remove
@@ -175,10 +182,15 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 		pass = DamageValid[guid]
 	else -- The one who dealt the very first bit of damage was probably the one who got the tag on the mob
 		-- This should apply in most (if not all) situations and is probably a safe fallback when we couldn't retrieve tapped status from GUID->Unit
-		pass = firstDamage == UnitName("player") or firstDamage == UnitName("pet") or (self.Global.COUNT_GROUP and self:IsInGroup(firstDamage))
+		pass = firstByPlayer or firstByGroup
 	end
+
+	if not self.Global.COUNT_GROUP and pass and not lastByPlayer then
+		pass = false -- Player or player's pet did not deal the killing blow and addon only tracks player kills
+	end
+
 	if not pass or id == 0 then return end
-	DamageTrack[guid] = nil
+	FirstDamage[guid] = nil
 	DamageValid[guid] = nil
 	self:AddKill(id, name)
 	if self.Timer:IsRunning() then
