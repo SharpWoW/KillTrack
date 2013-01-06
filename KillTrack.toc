@@ -20,4 +20,5 @@ MobList.lua
 Timer.lua
 TimerFrame.lua
 TimerFrame.xml
+ImmediateFrame.lua
 Broker.lua

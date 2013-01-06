@@ -1,5 +1,5 @@
 <!--
-	* Copyright (c) 2011 by Adam Hellberg.
+	* Copyright (c) 2011-2013 by Adam Hellberg.
 	*
 	* This file is part of KillTrack.
 	*
@@ -148,7 +148,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parent_CancelButton" inherits="UIPanelButtonTemplate" text="Cancel">
+			<Button name="$parent_CancelButton" inherits="UIPanelButtonTemplate" text="Stop">
 				<Size>
 					<AbsDimension x="60" y="16" />
 				</Size>

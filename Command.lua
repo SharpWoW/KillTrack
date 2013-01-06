@@ -1,5 +1,5 @@
 --[[
-	* Copyright (c) 2011 by Adam Hellberg.
+	* Copyright (c) 2011-2013 by Adam Hellberg.
 	*
 	* This file is part of KillTrack.
 	*
@@ -74,6 +74,7 @@ C:Register("__DEFAULT__", function(args)
 	KT:Msg("/kt purge [threshold] - Open dialog to purge entries, specifiying a threshold here is optional.")
 	KT:Msg("/kt reset - Clear the mob database.")
 	KT:Msg("/kt time - Track kills within specified time.")
+	KT:Msg("/kt immediate - Track kills made from this point on.")
 	KT:Msg("/kt threshold <threshold> - Set threshold for kill record notices to show.")
 	KT:Msg("/kt countmode - Toggle between counting group killing blows or your killing blows only.")
 	KT:Msg("/kt - Displays this help message.")
@@ -164,6 +165,8 @@ C:Register({"time", "timer"}, function(args)
 	end
 	KT.TimerFrame:Start(s, m, h)
 end)
+
+C:Register({"immediate", "imm", "i"}, function(args) KT.Immediate:Show() end)
 
 C:Register({"threshold"}, function(args)
 	if #args <= 0 then
