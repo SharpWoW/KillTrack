@@ -48,6 +48,7 @@ local data = {
 local clickFunctions = {
 	ctrl = {
 		LeftButton = function() KT:Announce("GROUP") end, -- Announce to group/say
+		MiddleButton = function() KT.Immediate:Toggle() end, -- Show the immediate frame
 		RightButton = function() KT:Announce("GUILD") end -- Announce to guild
 	},
 	none = {
@@ -92,6 +93,7 @@ function obj:OnTooltipShow()
 	self:AddDoubleLine("Middle Click", "Toggle short/long text", 0, 1, 0, 0, 1, 0)
 	self:AddDoubleLine("Right Click", "Reset session statistics", 0, 1, 0, 0, 1, 0)
 	self:AddDoubleLine("Ctrl + Left Click", "Announce to group/say", 0, 1, 0, 0, 1, 0)
+	self:AddDoubleLine("Ctrl + Middle Click", "Toggle immediate frame", 0, 1, 0, 0, 1, 0)
 	self:AddDoubleLine("Ctrl + Right Click", "Announce to guild", 0, 1, 0, 0, 1, 0)
 end
 

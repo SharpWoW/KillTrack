@@ -105,6 +105,14 @@ function I:Hide()
 	self.Active = false
 end
 
+function I:Toggle()
+	if frame and frame:IsShown() then
+		self:Hide()
+	else
+		self:Show()
+	end
+end
+
 function I:AddKill()
 	self.Kills = self.Kills + 1
 	frame.killCount:SetText(tostring(self.Kills))
