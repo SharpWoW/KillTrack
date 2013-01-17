@@ -166,7 +166,20 @@ C:Register({"time", "timer"}, function(args)
 	KT.TimerFrame:Start(s, m, h)
 end)
 
-C:Register({"immediate", "imm", "i"}, function(args) KT.Immediate:Show() end)
+C:Register({"immediate", "imm", "i"}, function(args)
+	if #args < 1 then
+		KT.Immediate:Show()
+	elseif args[1]:match("^t") then
+		local threshold = tonumber(args[2])
+		if #args < 2 then
+			KT:Msg("Usage: immediate threshold <threshold>")
+			KT:Msg("E.g: /kt immediate threshold 50")
+			KT:Msg("    Notice will be shown on every 50th kill when immediate frame is active")
+		else
+			KT:SetImmediateThreshold(threshold)
+		end
+	end
+end)
 
 C:Register({"threshold"}, function(args)
 	if #args <= 0 then

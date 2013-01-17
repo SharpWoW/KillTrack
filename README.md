@@ -35,6 +35,17 @@ Immediate Frame
 
 By using the command /kt immediate (or /kt i for short), you will get a small frame that shows you how many kills you've made since running the command. This can be useful for times when you need to kill a certain number of mobs, but do not wish to reset your session statistics. Simply run /kt i and it will track how many kills you do until you close it, reopening the frame will reset the count.
 
+With the command **/kt immediate threshold \<threshold\>**, where **\<threshold\>** is a number, the addon will display a message on screen and play sound each time you kill that many creatures.
+
+E.g: You open the immediate frame with **/kt i** and then set the threshold to 10 with **/kt i threshold 10**. Now each time you score 10 kills (10, 20, 30 et.c) you will see a message and hear a sound to notify you of this event. This can be useful when you need to score a certain number of kills for whatever reason (quests, item procs...).
+
+If you have some addon tracking procs or similar you could call this from Lua with something like:
+
+  KillTrack.Immediate:Show()
+  KillTrack:SetImmediateThreshold(someThreshold)
+
+To automatically start tracking.
+
 Feedback
 --------
 

@@ -47,6 +47,8 @@ local KT = KillTrack
 
 local KTT = KillTrack_Tools
 
+local IMMEDIATE_THRESHOLD_SOUND = "PVPTHROUGHQUEUE"
+
 local FirstDamage = {} -- Tracks first damage to a mob registered by CLEU
 local LastDamage = {} -- Tracks whoever did the most recent damage to a mob
 local DamageValid = {} -- Determines if mob is tapped by player/group
@@ -116,6 +118,9 @@ function KT.Events.ADDON_LOADED(self, ...)
 	end
 	if type(self.Global.IMMEDIATE.POSITION) ~= "table" then
 		self.Global.IMMEDIATE.POSITION = {}
+	end
+	if type(self.Global.IMMEDIATE.THRESHOLD) ~= "number" then
+		self.Global.IMMEDIATE.THRESHOLD = 0
 	end
 	if type(self.Global.BROKER) ~= "table" then
 		self.Global.BROKER = {}
@@ -244,6 +249,18 @@ function KT:SetThreshold(threshold)
 	KT:Msg(("New kill notice (achievement) threshold set to %d."):format(threshold))
 end
 
+function KT:SetImmediateThreshold(threshold)
+	if type(threshold) ~= "number" then
+		error("KillTrack.SetImmediateThreshold: Argument #1 (threshold) must be of type 'number'")
+	end
+	self.Global.IMMEDIATE.THRESHOLD = threshold
+	if threshold > 0 then
+		KT:Msg(("New immediate threshold set to %d."):format(threshold))
+	else
+		KT:Msg("Immediate threshold disabled.")
+	end
+end
+
 function KT:ToggleCountMode()
 	self.Global.COUNT_GROUP = not self.Global.COUNT_GROUP
 	if self.Global.COUNT_GROUP then
@@ -271,6 +288,11 @@ function KT:AddKill(id, name)
 	self:AddSessionKill(name)
 	if self.Immediate.Active then
 		self.Immediate:AddKill()
+		if self.Global.IMMEDIATE.THRESHOLD > 0 and self.Immediate.Kills % self.Global.IMMEDIATE.THRESHOLD == 0 then
+			PlaySound("RaidWarning")
+			PlaySound("PVPTHROUGHQUEUE")
+			RaidNotice_AddMessage(RaidWarningFrame, ("%d KILLS!"):format(self.Immediate.Kills), ChatTypeInfo["SYSTEM"])
+		end
 	end
 	if type(self.Global.MOBS[id].AchievCount) ~= "number" then
 		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
