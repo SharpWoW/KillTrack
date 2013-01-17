@@ -41,8 +41,8 @@ E.g: You open the immediate frame with **/kt i** and then set the threshold to 1
 
 If you have some addon tracking procs or similar you could call this from Lua with something like:
 
-  KillTrack.Immediate:Show()
-  KillTrack:SetImmediateThreshold(someThreshold)
+    KillTrack.Immediate:Show()
+    KillTrack:SetImmediateThreshold(someThreshold)
 
 To automatically start tracking.
 
