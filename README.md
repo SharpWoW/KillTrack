@@ -40,9 +40,10 @@ With the command **/kt immediate threshold \<threshold\>**, where **\<threshold\
 E.g: You open the immediate frame with **/kt i** and then set the threshold to 10 with **/kt i threshold 10**. Now each time you score 10 kills (10, 20, 30 et.c) you will see a message and hear a sound to notify you of this event. This can be useful when you need to score a certain number of kills for whatever reason (quests, item procs...).
 
 If you have some addon tracking procs or similar you could call this from Lua with something like:
-
-    KillTrack.Immediate:Show()
-    KillTrack:SetImmediateThreshold(someThreshold)
+```lua
+KillTrack.Immediate:Show()  
+KillTrack:SetImmediateThreshold(someThreshold)
+```
 
 To automatically start tracking.
 
