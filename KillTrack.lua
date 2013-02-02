@@ -298,15 +298,16 @@ function KT:AddKill(id, name)
 			RaidNotice_AddMessage(RaidWarningFrame, ("%d KILLS!"):format(self.Immediate.Kills), ChatTypeInfo["SYSTEM"])
 		end
 	end
+	if self.Global.ACHIEV_THRESHOLD <= 0 then return end
 	if type(self.Global.MOBS[id].AchievCount) ~= "number" then
 		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
-		if self.Global.ACHIEV_THRESHOLD > 0 and self.Global.MOBS[id].AchievCount >= 1 then
+		if self.Global.MOBS[id].AchievCount >= 1 then
 			self:KillAlert(self.Global.MOBS[id])
 		end
 	else
 		local achievCount = self.Global.MOBS[id].AchievCount
 		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
-		if self.Global.ACHIEV_THRESHOLD > 0 and self.Global.MOBS[id].AchievCount > achievCount then
+		if self.Global.MOBS[id].AchievCount > achievCount then
 			self:KillAlert(self.Global.MOBS[id])
 		end
 	end
