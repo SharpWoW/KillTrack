@@ -245,8 +245,12 @@ function KT:SetThreshold(threshold)
 		error("KillTrack.SetThreshold: Argument #1 (threshold) must be of type 'number'")
 	end
 	self.Global.ACHIEV_THRESHOLD = threshold
-	self:ResetAchievCount()
-	KT:Msg(("New kill notice (achievement) threshold set to %d."):format(threshold))
+	if threshold > 0 then
+		self:ResetAchievCount()
+		KT:Msg(("New kill notice (achievement) threshold set to %d."):format(threshold))
+	else
+		KT:Msg("Kill notices have been disabled (set threshold to a value greater than 0 to re-enable).")
+	end
 end
 
 function KT:SetImmediateThreshold(threshold)
@@ -296,13 +300,13 @@ function KT:AddKill(id, name)
 	end
 	if type(self.Global.MOBS[id].AchievCount) ~= "number" then
 		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
-		if self.Global.MOBS[id].AchievCount >= 1 then
+		if self.Global.ACHIEV_THRESHOLD > 0 and self.Global.MOBS[id].AchievCount >= 1 then
 			self:KillAlert(self.Global.MOBS[id])
 		end
 	else
 		local achievCount = self.Global.MOBS[id].AchievCount
 		self.Global.MOBS[id].AchievCount = floor(self.Global.MOBS[id].Kills / self.Global.ACHIEV_THRESHOLD)
-		if self.Global.MOBS[id].AchievCount > achievCount then
+		if self.Global.ACHIEV_THRESHOLD > 0 and self.Global.MOBS[id].AchievCount > achievCount then
 			self:KillAlert(self.Global.MOBS[id])
 		end
 	end
