@@ -84,5 +84,6 @@ end
 -----------------
 
 function KTT:GUIDToID(guid)
+	if not guid then return nil end
 	return tonumber(guid:sub(6, 10), 16)
 end
