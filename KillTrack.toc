@@ -1,4 +1,4 @@
-## Interface: 50300
+## Interface: 50400
 ## Version: @project-version@
 ## Title: KillTrack
 ## Notes: Keeps track of how many kills you have per mob and displays them in a list.
