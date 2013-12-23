@@ -58,7 +58,6 @@ local IMMEDIATE_THRESHOLD_SOUND = "PVPTHROUGHQUEUE"
 local FirstDamage = {} -- Tracks first damage to a mob registered by CLEU
 local LastDamage = {} -- Tracks whoever did the most recent damage to a mob
 local DamageValid = {} -- Determines if mob is tapped by player/group
-local PlayerDamage = {} -- Tracks whether the player has done any damage to a specific mob
 
 local Units = {
 	"target",
@@ -161,14 +160,9 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 
 		LastDamage[t_guid] = s_name
 
-		if PlayerDamage[t_guid] == nil or PlayerDamage[t_guid] == false then
-			PlayerDamage[t_guid] = (s_name == self.PlayerName)
-		end
-
-		if DamageValid[t_guid] == nil then
+		if DamageValid[t_guid] == nil or DamageValid[t_guid] == false then
 			-- if DamageValid returns true for a GUID, we can tell with 100% certainty that it's valid
 			-- But this relies on one of the valid unit names currently being the damaged mob
-			-- Or if it's false, we can tell with 100% certainty that someone else tagged the mob
 
 			local t_unit = FindUnitByGUID(t_guid)
 
@@ -178,7 +172,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 
 			if not tapped and not PlayerDamage[t_guid] then return end
 
-			DamageValid[t_guid] = (tapped and (UnitIsTappedByPlayer(t_unit) or UnitIsTappedByAllThreatList(t_unit))) or (not tapped and PlayerDamage[t_guid])
+			DamageValid[t_guid] = (tapped and UnitIsTappedByPlayer(t_unit))
 		end
 
 		return
