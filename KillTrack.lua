@@ -17,6 +17,12 @@
 	* along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+-- Upvalue some functions used in CLEU
+local UnitGUID = UnitGUID
+local UnitIsTapped = UnitIsTapped
+local UnitIsTappedByAllThreatList = UnitIsTappedByAllThreatList
+local UnitIsTappedByPlayer = UnitIsTappedByPlayer
+
 KillTrack = {
 	Name = "KillTrack",
 	Version = GetAddOnMetadata("KillTrack", "Version"),
@@ -52,6 +58,7 @@ local IMMEDIATE_THRESHOLD_SOUND = "PVPTHROUGHQUEUE"
 local FirstDamage = {} -- Tracks first damage to a mob registered by CLEU
 local LastDamage = {} -- Tracks whoever did the most recent damage to a mob
 local DamageValid = {} -- Determines if mob is tapped by player/group
+local PlayerDamage = {} -- Tracks whether the player has done any damage to a specific mob
 
 local Units = {
 	"target",
@@ -154,6 +161,10 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 
 		LastDamage[t_guid] = s_name
 
+		if PlayerDamage[t_guid] == nil or PlayerDamage[t_guid] == false then
+			PlayerDamage[t_guid] = (s_name == self.PlayerName)
+		end
+
 		if DamageValid[t_guid] == nil then
 			-- if DamageValid returns true for a GUID, we can tell with 100% certainty that it's valid
 			-- But this relies on one of the valid unit names currently being the damaged mob
@@ -165,9 +176,9 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 
 			local tapped = UnitIsTapped(t_unit)
 
-			if not tapped then return end
+			if not tapped and not PlayerDamage[t_guid] then return end
 
-			DamageValid[t_guid] = tapped and UnitIsTappedByPlayer(t_unit)
+			DamageValid[t_guid] = (tapped and (UnitIsTappedByPlayer(t_unit) or UnitIsTappedByAllThreatList(t_unit))) or (not tapped and PlayerDamage[t_guid])
 		end
 
 		return
@@ -181,9 +192,9 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local name = tostring((select(9, ...)))
 	local firstDamage = FirstDamage[t_guid] or "<No One>"
 	local lastDamage = LastDamage[t_guid] or "<No One>"
-	local firstByPlayer = firstDamage == (self.PlayerName or UnitName("player")) or firstDamage == UnitName("pet")
+	local firstByPlayer = firstDamage == (self.PlayerName or self.PlayerName) or firstDamage == UnitName("pet")
 	local firstByGroup = self:IsInGroup(firstDamage)
-	local lastByPlayer = lastDamage == UnitName("player") or lastDamage == UnitName("pet")
+	local lastByPlayer = lastDamage == self.PlayerName or lastDamage == UnitName("pet")
 	local pass
 
 	-- All checks after DamageValid should be safe to remove
@@ -235,7 +246,7 @@ function KT:ToggleDebug()
 end
 
 function KT:IsInGroup(unit)
-	if unit == UnitName("player") then return true end
+	if unit == self.PlayerName then return true end
 	if UnitInParty(unit) then return true end
 	if UnitInRaid(unit) then return true end
 	return false
