@@ -170,7 +170,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 
 			local tapped = UnitIsTapped(t_unit)
 
-			if not tapped and not PlayerDamage[t_guid] then return end
+			if not tapped then return end
 
 			DamageValid[t_guid] = (tapped and UnitIsTappedByPlayer(t_unit))
 		end
