@@ -271,6 +271,19 @@ function KT:SetImmediateThreshold(threshold)
 	end
 end
 
+function KT:SetImmediateFilter(filter)
+	if type(filter) ~= "string" then
+		error("KillTrack.SetImmediateFilter: Argument #1 (filter) must be of type 'string'")
+	end
+	self.Global.IMMEDIATE.FILTER = filter
+	KT:Msg("New immediate filter set to: " .. filter)
+end
+
+function KT:ClearImmediateFilter()
+	self.Global.IMMEDIATE.FILTER = nil
+	KT:Msg("Immediate filter cleared!")
+end
+
 function KT:ToggleCountMode()
 	self.Global.COUNT_GROUP = not self.Global.COUNT_GROUP
 	if self.Global.COUNT_GROUP then
@@ -297,11 +310,15 @@ function KT:AddKill(id, name)
 	end
 	self:AddSessionKill(name)
 	if self.Immediate.Active then
-		self.Immediate:AddKill()
-		if self.Global.IMMEDIATE.THRESHOLD > 0 and self.Immediate.Kills % self.Global.IMMEDIATE.THRESHOLD == 0 then
-			PlaySound("RaidWarning")
-			PlaySound("PVPTHROUGHQUEUE")
-			RaidNotice_AddMessage(RaidWarningFrame, ("%d KILLS!"):format(self.Immediate.Kills), ChatTypeInfo["SYSTEM"])
+		local filter = self.Global.IMMEDIATE.FILTER
+		local filterPass = not filter or name:match(filter)
+		if filterPass then
+			self.Immediate:AddKill()
+			if self.Global.IMMEDIATE.THRESHOLD > 0 and self.Immediate.Kills % self.Global.IMMEDIATE.THRESHOLD == 0 then
+				PlaySound("RaidWarning")
+				PlaySound("PVPTHROUGHQUEUE")
+				RaidNotice_AddMessage(RaidWarningFrame, ("%d KILLS!"):format(self.Immediate.Kills), ChatTypeInfo["SYSTEM"])
+			end
 		end
 	end
 	if self.Global.ACHIEV_THRESHOLD <= 0 then return end

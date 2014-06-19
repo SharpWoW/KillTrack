@@ -178,6 +178,17 @@ C:Register({"immediate", "imm", "i"}, function(args)
 		else
 			KT:SetImmediateThreshold(threshold)
 		end
+	elseif args[1]:match("^f") then
+		if #args < 2 then
+			local current = KT.Global.IMMEDIATE.FILTER
+			KT:Msg("The current immediate filter is set to: " .. (current and current or "<No filter>"))
+			KT:Msg("Use /kt immediate filter <filter> to set a new filter")
+			KT:Msg("Use /kt immediate clearfilter to clear the filter")
+		else
+			KT:SetImmediateFilter(tostring(args[2]))
+		end
+	elseif args[1]:match("^c") then
+		KT:ClearImmediateFilter()
 	end
 end)
 
