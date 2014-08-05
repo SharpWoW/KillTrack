@@ -394,7 +394,7 @@ function KT:GetSessionStats()
 	if not self.Session.Start then return 0, 0, 0 end
 	local now = time()
 	local session = now - self.Session.Start
-	local kps = self.Session.Count / session
+	local kps = session == 0 and 0 or self.Session.Count / session
 	local kpm = kps * 60
 	local kph = kpm * 60
 	return kps, kpm, kph, session
