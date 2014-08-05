@@ -19,11 +19,7 @@
 
 -- Beware of some possibly messy code in this file
 
-local MAX_LOAD_INDEX = 200
-
-KillTrack.MobList = {
-	LoadWarning = false
-}
+KillTrack.MobList = {}
 
 local KT = KillTrack
 local ML = KT.MobList
@@ -314,12 +310,13 @@ function ML:Create()
 
 	local previous = frame.idHeader
 	for i = 1, ROW_COUNT do
-		frame.rows["row" .. i] = CreateRow(frame.rows, previous)
-		frame.rows["row" .. i].idField:SetText("")
-		frame.rows["row" .. i].nameField:SetText("")
-		frame.rows["row" .. i].charKillField:SetText("")
-		frame.rows["row" .. i].globalKillField:SetText("")
-		previous = frame.rows["row" .. i]
+		local key = "row" .. i
+		frame.rows[key] = CreateRow(frame.rows, previous)
+		frame.rows[key].idField:SetText("")
+		frame.rows[key].nameField:SetText("")
+		frame.rows[key].charKillField:SetText("")
+		frame.rows[key].globalKillField:SetText("")
+		previous = frame.rows[key]
 	end
 
 	frame.rows.scroller = CreateFrame("ScrollFrame", "KillTrackMobListScrollFrame", frame.rows, "FauxScrollFrameTemplateLight")
