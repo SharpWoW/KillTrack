@@ -85,6 +85,6 @@ end
 
 function KTT:GUIDToID(guid)
 	if not guid then return nil end
-	local id = guid:match("^%w+:0:%d+:%d+:%d+:(%d+):[A-Z%d]+$")
+	local id = guid:match("^%w+%-0%-%d+%-%d+%-%d+%-(%d+)%-[A-Z%d]+$")
 	return tonumber(id)
 end
