@@ -50,6 +50,7 @@ KillTrack = {
 }
 
 local KT = KillTrack
+local ET
 
 local KTT = KillTrack_Tools
 
@@ -103,6 +104,7 @@ end
 function KT.Events.ADDON_LOADED(self, ...)
 	local name = (select(1, ...))
 	if name ~= "KillTrack" then return end
+	ET = KT.ExpTracker
 	if type(_G["KILLTRACK"]) ~= "table" then
 		_G["KILLTRACK"] = {}
 	end
@@ -219,7 +221,7 @@ function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 	local id = KTT:GUIDToID(UnitGUID("mouseover"))
 	if not id then return end
 	if UnitCanAttack("player", "mouseover") then
-		local mob, charMob = self:GetMob(id)
+		local mob, charMob = self:InitMob(id, UnitName("mouseover"))
 		local gKills, cKills = mob.Kills, charMob.Kills --self:GetKills(id)
 		local exp = mob.Exp
 		GameTooltip:AddLine(("Killed %d (%d) times."):format(cKills, gKills), 1, 1, 1)
@@ -232,6 +234,10 @@ function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 		GameTooltip:AddLine(("ID = %d"):format(id))
 	end
 	GameTooltip:Show()
+end
+
+function KT.Events.CHAT_MSG_COMBAT_XP_GAIN(self, message)
+	ET:CheckMessage(message)
 end
 
 function KT:ToggleExp()
@@ -322,6 +328,8 @@ function KT:InitMob(id, name)
 	elseif self.CharGlobal.MOBS[id].Name ~= name then
 		self.CharGlobal.MOBS[id].Name = name
 	end
+
+	return self:GetMob(id)
 end
 
 function KT:AddKill(id, name)

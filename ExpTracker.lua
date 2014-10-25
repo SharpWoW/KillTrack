@@ -41,11 +41,22 @@ KT.ExpTracker = {
 
 local ET = KT.ExpTracker
 
+local initialized = false
+
+local function Initialize()
+    for i = 1, #ET.Strings do
+        ET.Strings[i] = ET.Strings[i]:gsub("%%s", "([%%w%%s]+)"):gsub("%%d", "(%%d+)")
+    end
+    initialized = true
+end
+
 function ET:CheckMessage(message)
+    if not initialized then Initialize() end
     local name, exp
     for i = 1, #self.Strings do
         local str = self.Strings[i]
         name, exp = message:match(str)
+        if name and exp then break end
     end
 
     exp = tonumber(exp)
