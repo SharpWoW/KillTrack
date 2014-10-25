@@ -215,6 +215,10 @@ C:Register({"debug", "toggledebug", "d", "td"}, function(args)
 	KT:ToggleDebug()
 end)
 
+C:Register({"exp", "xp", "experience", "shoexp", "showxp"}, function(args)
+	KT:ToggleExp()
+end)
+
 for i,v in ipairs(C.Slash) do
 	_G["SLASH_" .. KT.Name:upper() .. i] = "/" .. v
 end

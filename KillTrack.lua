@@ -116,6 +116,9 @@ function KT.Events.ADDON_LOADED(self, ...)
 	if type(self.Global.COUNT_GROUP) ~= "boolean" then
 		self.Global.COUNT_GROUP = false
 	end
+	if type(self.Global.SHOW_EXP) ~= "boolean" then
+		self.Global.SHOW_EXP = false
+	end
 	if type(self.Global.MOBS) ~= "table" then
 		self.Global.MOBS = {}
 	end
@@ -216,13 +219,28 @@ function KT.Events.UPDATE_MOUSEOVER_UNIT(self, ...)
 	local id = KTT:GUIDToID(UnitGUID("mouseover"))
 	if not id then return end
 	if UnitCanAttack("player", "mouseover") then
-		local gKills, cKills = self:GetKills(id)
+		local mob, charMob = self:GetMob(id)
+		local gKills, cKills = mob.Kills, charMob.Kills --self:GetKills(id)
+		local exp = mob.Exp
 		GameTooltip:AddLine(("Killed %d (%d) times."):format(cKills, gKills), 1, 1, 1)
+		if self.Global.SHOW_EXP and exp then
+			local toLevel = exp > 0 and math.ceil((UnitXPMax("player") - UnitXP("player")) / exp) or "N/A"
+			GameTooltip:AddLine(("EXP: %d (%s kills to level)"):format(exp, toLevel), 1, 1, 1)
+		end
 	end
 	if KT.Debug then
 		GameTooltip:AddLine(("ID = %d"):format(id))
 	end
 	GameTooltip:Show()
+end
+
+function KT:ToggleExp()
+	self.Global.SHOW_EXP = not self.Global.SHOW_EXP
+	if self.Global.SHOW_EXP then
+		KT:Msg("Now showing EXP on tooltips!")
+	else
+		KT:Msg("No longer showing EXP on tooltips.")
+	end
 end
 
 function KT:ToggleDebug()
@@ -352,7 +370,9 @@ function KT:AddSessionKill(name)
 end
 
 function KT:SetExp(name, exp)
-
+	for id, mob in pairs(self.Global.MOBS) do
+		if mob.Name == name then mob.Exp = tonumber(exp) end
+	end
 end
 
 function KT:GetSortedSessionKills(max)

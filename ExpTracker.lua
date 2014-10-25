@@ -48,5 +48,9 @@ function ET:CheckMessage(message)
         name, exp = message:match(str)
     end
 
-    
+    exp = tonumber(exp)
+
+    if type(name) == "string" and name ~= "" and type(exp) == "number" then
+        KT:SetExp(name, exp)
+    end
 end
