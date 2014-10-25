@@ -288,17 +288,28 @@ function KT:ToggleCountMode()
 	end
 end
 
-function KT:AddKill(id, name)
+function KT:InitMob(id, name)
 	name = name or "<No Name>"
+
 	if type(self.Global.MOBS[id]) ~= "table" then
 		self.Global.MOBS[id] = { Name = name, Kills = 0, AchievCount = 0 }
 		self:Msg(("Created new entry for %q"):format(name))
+	elseif self.Global.MOBS[id].Name ~= name then
+		self.Global.MOBS[id].Name = name
 	end
-	self.Global.MOBS[id].Kills = self.Global.MOBS[id].Kills + 1
+
 	if type(self.CharGlobal.MOBS[id]) ~= "table" then
 		self.CharGlobal.MOBS[id] =  { Name = name, Kills = 0 }
 		self:Msg(("Created new entry for %q on this character."):format(name))
+	elseif self.CharGlobal.MOBS[id].Name ~= name then
+		self.CharGlobal.MOBS[id].Name = name
 	end
+end
+
+function KT:AddKill(id, name)
+	name = name or "<No Name>"
+	self:InitMob(id, name)
+	self.Global.MOBS[id].Kills = self.Global.MOBS[id].Kills + 1
 	self.CharGlobal.MOBS[id].Kills = self.CharGlobal.MOBS[id].Kills + 1
 	if self.Global.PRINTKILLS then
 		self:Msg(("Updated %q, new kill count: %d. Kill count on this character: %d"):format(name, self.Global.MOBS[id].Kills, self.CharGlobal.MOBS[id].Kills))
@@ -338,6 +349,10 @@ function KT:AddSessionKill(name)
 		self.Session.Kills[name] = 1
 	end
 	self.Session.Count = self.Session.Count + 1
+end
+
+function KT:SetExp(name, exp)
+
 end
 
 function KT:GetSortedSessionKills(max)
