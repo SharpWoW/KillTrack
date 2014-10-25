@@ -401,12 +401,12 @@ end
 
 function KT:GetKills(id)
 	local gKills, cKills = 0, 0
-	for k,v in pairs(self.Global.MOBS) do
-		if k == id and type(v) == "table" then
-			gKills = v.Kills
-			if self.CharGlobal.MOBS[k] then
-				cKills = self.CharGlobal.MOBS[k].Kills
-			end
+	local mob = self.Global.MOBS[id]
+	if type(mob) == "table" then
+		gKills = mob.Kills
+		local cMob = self.CharGlobal.MOBS[id]
+		if type(cMob) == "table" then
+			cKills = cMob.Kills
 		end
 	end
 	return gKills, cKills
