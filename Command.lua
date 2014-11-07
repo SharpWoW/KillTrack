@@ -95,6 +95,15 @@ C:Register({"print", "p"}, function(args)
 	end
 end)
 
+C:Register({"printnew", "pn"}, function(args)
+	KT.Global.PRINTNEW = not KT.Global.PRINTNEW
+	if KT.Global.PRINTNEW then
+		KT:Msg("Announcing new mob entries")
+	else
+		KT:Msg("No longer announcing new mob entries")
+	end
+end)
+
 C:Register({"delete", "del", "remove", "rem"}, function(args)
 	if #args <= 0 then
 		KT:Msg("Missing argument: id")

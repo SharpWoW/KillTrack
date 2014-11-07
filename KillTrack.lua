@@ -110,7 +110,10 @@ function KT.Events.ADDON_LOADED(self, ...)
 	end
 	self.Global = _G["KILLTRACK"]
 	if type(self.Global.PRINTKILLS) ~= "boolean" then
-		self.Global.PRINTKILLS = true
+		self.Global.PRINTKILLS = false
+	end
+	if type(self.Global.PRINTNEW) ~= "boolean" then
+		self.Global.PRINTNEW = false
 	end
 	if type(self.Global.ACHIEV_THRESHOLD) ~= "number" then
 		self.Global.ACHIEV_THRESHOLD = 1000
@@ -317,14 +320,18 @@ function KT:InitMob(id, name)
 
 	if type(self.Global.MOBS[id]) ~= "table" then
 		self.Global.MOBS[id] = { Name = name, Kills = 0, AchievCount = 0 }
-		self:Msg(("Created new entry for %q"):format(name))
+		if self.Global.PRINTNEW then
+			self:Msg(("Created new entry for %q"):format(name))
+		end
 	elseif self.Global.MOBS[id].Name ~= name then
 		self.Global.MOBS[id].Name = name
 	end
 
 	if type(self.CharGlobal.MOBS[id]) ~= "table" then
 		self.CharGlobal.MOBS[id] =  { Name = name, Kills = 0 }
-		self:Msg(("Created new entry for %q on this character."):format(name))
+		if self.Global.PRINTNEW then
+			self:Msg(("Created new entry for %q on this character."):format(name))
+		end
 	elseif self.CharGlobal.MOBS[id].Name ~= name then
 		self.CharGlobal.MOBS[id].Name = name
 	end
