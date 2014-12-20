@@ -5,12 +5,16 @@
 ## Author: F16Gaming
 ## SavedVariables: KILLTRACK
 ## SavedVariablesPerCharacter: KILLTRACK_CHAR
+## OptionalDeps: LibStub, CallbackHandler-1.0, LibDBIcon-1.0
 
 #@no-lib-strip@
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 #@end-no-lib-strip@
 libs\LibDataBroker-1-1\LibDataBroker-1.1.lua
+#@no-lib-strip@
+libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+#@end-no-lib-strip@
 
 Tools.lua
 KillTrack.lua

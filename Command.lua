@@ -77,6 +77,7 @@ C:Register("__DEFAULT__", function(args)
 	KT:Msg("/kt immediate - Track kills made from this point on.")
 	KT:Msg("/kt threshold <threshold> - Set threshold for kill record notices to show.")
 	KT:Msg("/kt countmode - Toggle between counting group killing blows or your killing blows only.")
+	KT:Msg("/kt minimap - Toggles the minimap icon")
 	KT:Msg("/kt - Displays this help message.")
 end)
 
@@ -230,6 +231,10 @@ end)
 
 C:Register({"options", "opt", "config", "conf"}, function(args)
 	KT.Options:Open()
+end)
+
+C:Register({"minimap", "mp"}, function(args)
+	KT.Broker:SetMinimap(not KT.Global.BROKER.MINIMAP.hide)
 end)
 
 for i,v in ipairs(C.Slash) do

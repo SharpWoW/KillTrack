@@ -33,6 +33,7 @@ local UPDATE = 1
 local t = 0
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
+local icon = LibStub:GetLibrary("LibDBIcon-1.0")
 
 local frame = CreateFrame("Frame")
 
@@ -146,6 +147,19 @@ function KTB:ToggleTextMode()
 end
 
 function KTB:OnLoad()
+	if type(KT.Global.BROKER.MINIMAP.hide) ~= "boolean" then
+		KT.Global.BROKER.MINIMAP.hide = true
+	end
+	icon:Register(KT.Name, obj, KT.Global.BROKER.MINIMAP)
 	frame:SetScript("OnUpdate", function(self, elapsed) KTB:OnUpdate(self, elapsed) end)
 	self:UpdateText()
+end
+
+function KTB:SetMinimap(enabled)
+	KT.Global.BROKER.MINIMAP.hide = not enabled
+	if enabled then
+		icon:Show(KT.Name)
+	else
+		icon:Hide(KT.Name)
+	end
 end

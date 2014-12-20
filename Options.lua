@@ -156,11 +156,18 @@ function Opt:Show()
     reset:SetWidth(150)
     reset:SetPoint("TOPLEFT", purge, "TOPRIGHT", 8, 0)
 
+    local minimap = checkbox("Show minimap icon", "Adds the KillTrack broker to your minimap",
+        function(check, checked)
+            KT.Broker:SetMinimap(checked)
+        end)
+    minimap:SetPoint("TOPLEFT", purge, "BOTTOMLEFT", 0, -8)
+
     local function init()
         printKills:SetChecked(KT.Global.PRINT)
         printNew:SetChecked(KT.Global.PRINTNEW)
         countGroup:SetChecked(KT.Global.COUNT_GROUP)
         threshold:SetText(KT.Global.ACHIEV_THRESHOLD)
+        minimap:SetChecked(not KT.Global.BROKER.MINIMAP.hide)
     end
 
     init()

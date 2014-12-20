@@ -142,6 +142,9 @@ function KT.Events.ADDON_LOADED(self, ...)
 	if type(self.Global.BROKER.SHORT_TEXT) ~= "boolean" then
 		self.Global.BROKER.SHORT_TEXT = false
 	end
+	if type(self.Global.BROKER.MINIMAP) ~= "table" then
+		self.Global.BROKER.MINIMAP = {}
+	end
 	if type(_G["KILLTRACK_CHAR"]) ~= "table" then
 		_G["KILLTRACK_CHAR"] = {}
 	end
