@@ -228,6 +228,10 @@ C:Register({"exp", "xp", "experience", "shoexp", "showxp"}, function(args)
 	KT:ToggleExp()
 end)
 
+C:Register({"options", "opt", "config", "conf"}, function(args)
+	KT.Options:Open()
+end)
+
 for i,v in ipairs(C.Slash) do
 	_G["SLASH_" .. KT.Name:upper() .. i] = "/" .. v
 end

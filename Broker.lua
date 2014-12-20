@@ -46,15 +46,18 @@ local data = {
 }
 
 local clickFunctions = {
+	none = {
+		LeftButton = function() KT.MobList:Toggle() end,
+		MiddleButton = function() KTB:ToggleTextMode() end,
+		RightButton = function() KT:ResetSession() end
+	},
 	ctrl = {
 		LeftButton = function() KT:Announce("GROUP") end, -- Announce to group/say
 		MiddleButton = function() KT.Immediate:Toggle() end, -- Show the immediate frame
 		RightButton = function() KT:Announce("GUILD") end -- Announce to guild
 	},
-	none = {
-		LeftButton = function() KT.MobList:Toggle() end,
-		MiddleButton = function() KTB:ToggleTextMode() end,
-		RightButton = function() KT:ResetSession() end
+	shift = {
+		LeftButton = function() KT.Options:Open() end
 	}
 }
 
@@ -95,6 +98,7 @@ function obj:OnTooltipShow()
 	self:AddDoubleLine("Ctrl + Left Click", "Announce to group/say", 0, 1, 0, 0, 1, 0)
 	self:AddDoubleLine("Ctrl + Middle Click", "Toggle immediate frame", 0, 1, 0, 0, 1, 0)
 	self:AddDoubleLine("Ctrl + Right Click", "Announce to guild", 0, 1, 0, 0, 1, 0)
+	self:AddDoubleLine("Shift + Left Click", "Open options panel", 0, 1, 0, 0, 1, 0)
 end
 
 function obj:OnClick(button)
