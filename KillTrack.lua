@@ -19,9 +19,7 @@
 
 -- Upvalue some functions used in CLEU
 local UnitGUID = UnitGUID
-local UnitIsTapped = UnitIsTapped
-local UnitIsTappedByAllThreatList = UnitIsTappedByAllThreatList
-local UnitIsTappedByPlayer = UnitIsTappedByPlayer
+local UnitIsTapDenied = UnitIsTapDenied
 
 KillTrack = {
 	Name = "KillTrack",
