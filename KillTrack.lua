@@ -167,7 +167,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, timestamp, event, hideCaste
 
 		LastDamage[d_guid] = s_name
 
-		if DamageValid[d_guid] == nil or DamageValid[d_guid] == false then
+		if not DamageValid[d_guid] then --DamageValid[d_guid] == nil or DamageValid[d_guid] == false then
 			-- if DamageValid returns true for a GUID, we can tell with 100% certainty that it's valid
 			-- But this relies on one of the valid unit names currently being the damaged mob
 
@@ -175,11 +175,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, timestamp, event, hideCaste
 
 			if not d_unit then return end
 
-			local tapped = UnitIsTapped(d_unit)
-
-			if not tapped then return end
-
-			DamageValid[d_guid] = (tapped and UnitIsTappedByPlayer(d_unit))
+			DamageValid[d_guid] = not UnitIsTapDenied(d_unit)
 		end
 
 		return
