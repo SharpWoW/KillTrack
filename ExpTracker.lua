@@ -45,7 +45,7 @@ local initialized = false
 
 local function Initialize()
     for i = 1, #ET.Strings do
-        ET.Strings[i] = ET.Strings[i]:gsub("([%(%)])", "%%%1"):gsub("%%s", "([%%w%%s]+)"):gsub("%%d", "(%%d+)")
+        ET.Strings[i] = ET.Strings[i]:gsub("([%(%)])", "%%%1"):gsub("%%s", "(.-)"):gsub("%%d", "(%%d+)")
     end
     initialized = true
 end
