@@ -207,7 +207,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, timestamp, event, hideCaste
 		pass = false -- Player or player's pet did not deal the killing blow and addon only tracks player kills
 	end
 
-	if not pass or d_id == 0 then return end
+	if not pass or d_id == nil or d_id == 0 then return end
 	FirstDamage[d_guid] = nil
 	DamageValid[d_guid] = nil
 	self:AddKill(d_id, name)
