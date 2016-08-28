@@ -185,7 +185,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, timestamp, event, hideCaste
 	local d_id = KTT:GUIDToID(d_guid)
 	local firstDamage = FirstDamage[d_guid] or "<No One>"
 	local lastDamage = LastDamage[d_guid] or "<No One>"
-	local firstByPlayer = firstDamage == (self.PlayerName or self.PlayerName) or firstDamage == UnitName("pet")
+	local firstByPlayer = firstDamage == self.PlayerName or firstDamage == UnitName("pet")
 	local firstByGroup = self:IsInGroup(firstDamage)
 	local lastByPlayer = lastDamage == self.PlayerName or lastDamage == UnitName("pet")
 	local pass
