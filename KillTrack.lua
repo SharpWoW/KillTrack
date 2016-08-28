@@ -183,7 +183,6 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, timestamp, event, hideCaste
 
 	-- Perform solo/group checks
 	local d_id = KTT:GUIDToID(d_guid)
-	local name = tostring(d_name)
 	local firstDamage = FirstDamage[d_guid] or "<No One>"
 	local lastDamage = LastDamage[d_guid] or "<No One>"
 	local firstByPlayer = firstDamage == (self.PlayerName or self.PlayerName) or firstDamage == UnitName("pet")
@@ -210,7 +209,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, timestamp, event, hideCaste
 	if not pass or d_id == nil or d_id == 0 then return end
 	FirstDamage[d_guid] = nil
 	DamageValid[d_guid] = nil
-	self:AddKill(d_id, name)
+	self:AddKill(d_id, d_name)
 	if self.Timer:IsRunning() then
 		self.Timer:SetData("Kills", self.Timer:GetData("Kills", true) + 1)
 	end
