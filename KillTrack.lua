@@ -165,7 +165,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, timestamp, event, hideCaste
 
 		LastDamage[d_guid] = s_name
 
-		if not DamageValid[d_guid] then --DamageValid[d_guid] == nil or DamageValid[d_guid] == false then
+		if not DamageValid[d_guid] then
 			-- if DamageValid returns true for a GUID, we can tell with 100% certainty that it's valid
 			-- But this relies on one of the valid unit names currently being the damaged mob
 
