@@ -37,7 +37,7 @@ local function checkbox(label, description, onclick)
     local check = CreateFrame("CheckButton", "KillTrackOptCheck" .. checkCounter, panel, "InterfaceOptionsCheckButtonTemplate")
     check:SetScript("OnClick", function(self)
         local checked = self:GetChecked()
-        PlaySound(checked and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff")
+        PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
         onclick(self, checked and true or false)
     end)
     check.label = _G[check:GetName() .. "Text"]
