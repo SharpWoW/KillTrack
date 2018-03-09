@@ -143,6 +143,12 @@ function KT.Events.ADDON_LOADED(self, ...)
 	if type(self.Global.BROKER.MINIMAP) ~= "table" then
 		self.Global.BROKER.MINIMAP = {}
 	end
+	if type(self.Global.DISABLE_DUNGEONS) ~= "boolean" then
+		self.Global.DISABLE_DUNGEONS = false
+	end
+	if type(self.Global.DISABLE_RAIDS) ~= "boolean" then
+		self.Global.DISABLE_RAIDS = false
+	end
 	if type(_G["KILLTRACK_CHAR"]) ~= "table" then
 		_G["KILLTRACK_CHAR"] = {}
 	end
@@ -237,6 +243,22 @@ end
 
 function KT.Events.CHAT_MSG_COMBAT_XP_GAIN(self, message)
 	ET:CheckMessage(message)
+end
+
+function KT.Events.ENCOUNTER_START(self, encounterID, name, difficulty, size)
+	if (self.Global.DISABLE_DUNGEONS and size == 5) or (self.Global.DISABLE_RAIDS and size > 5) then
+		self.Frame:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+		self.Frame:UnregisterEvent("UPDATE_MOUSEOVER_UNIT")
+		self.Frame:UnregisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
+	end
+end
+
+function KT.Events.ENCOUNTER_END(self, encounterID, name, difficulty, size)
+	if (self.Global.DISABLE_DUNGEONS and size == 5) or (self.Global.DISABLE_RAIDS and size > 5) then
+		self.Frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+		self.Frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+		self.Frame:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
+	end
 end
 
 function KT:ToggleExp()
