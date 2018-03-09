@@ -163,14 +163,14 @@ function Opt:Show()
     minimap:SetPoint("TOPLEFT", purge, "BOTTOMLEFT", 0, -8)
 
     local disableDungeons = checkbox("Disable in dungeons (save CPU)",
-        "With this is checked, mob kills in dungeons won't be counted.",
+        "When this is checked, mob kills in dungeons won't be counted.",
         function(check, checked)
             KT.Global.DISABLE_DUNGEONS = checked
         end)
     disableDungeons:SetPoint("TOPLEFT", minimap, "BOTTOMLEFT", 0, -8)
 
     local disableRaids = checkbox("Disable in raids (save CPU)",
-        "With this is checked, mob kills in raids won't be counted.",
+        "When this is checked, mob kills in raids won't be counted.",
         function(check, checked)
             KT.Global.DISABLE_RAIDS = checked
         end)
