@@ -37,7 +37,7 @@ local function checkbox(label, description, onclick)
     local check = CreateFrame("CheckButton", "KillTrackOptCheck" .. checkCounter, panel, "InterfaceOptionsCheckButtonTemplate")
     check:SetScript("OnClick", function(self)
         local checked = self:GetChecked()
-        PlaySound(checked and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff")
+        PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
         onclick(self, checked and true or false)
     end)
     check.label = _G[check:GetName() .. "Text"]
@@ -162,12 +162,28 @@ function Opt:Show()
         end)
     minimap:SetPoint("TOPLEFT", purge, "BOTTOMLEFT", 0, -8)
 
+    local disableDungeons = checkbox("Disable in dungeons (save CPU)",
+        "When this is checked, mob kills in dungeons won't be counted.",
+        function(check, checked)
+            KT.Global.DISABLE_DUNGEONS = checked
+        end)
+    disableDungeons:SetPoint("TOPLEFT", minimap, "BOTTOMLEFT", 0, -8)
+
+    local disableRaids = checkbox("Disable in raids (save CPU)",
+        "When this is checked, mob kills in raids won't be counted.",
+        function(check, checked)
+            KT.Global.DISABLE_RAIDS = checked
+        end)
+    disableRaids:SetPoint("TOPLEFT", disableDungeons, "BOTTOMLEFT", 0, -8)
+
     local function init()
         printKills:SetChecked(KT.Global.PRINT)
         printNew:SetChecked(KT.Global.PRINTNEW)
         countGroup:SetChecked(KT.Global.COUNT_GROUP)
         threshold:SetText(KT.Global.ACHIEV_THRESHOLD)
         minimap:SetChecked(not KT.Global.BROKER.MINIMAP.hide)
+        disableDungeons:SetChecked(KT.Global.DISABLE_DUNGEONS)
+        disableRaids:SetChecked(KT.Global.DISABLE_RAIDS)
     end
 
     init()
