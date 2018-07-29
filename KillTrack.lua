@@ -20,6 +20,7 @@
 -- Upvalue some functions used in CLEU
 local UnitGUID = UnitGUID
 local UnitIsTapDenied = UnitIsTapDenied
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 
 KillTrack = {
 	Name = "KillTrack",
@@ -162,7 +163,8 @@ function KT.Events.ADDON_LOADED(self, ...)
 	self.Broker:OnLoad()
 end
 
-function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self, timestamp, event, hideCaster, s_guid, s_name, s_flags, s_raidflags, d_guid, d_name, d_flags, d_raidflags)
+function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
+	local timestamp, event, hideCaster, s_guid, s_name, s_flags, s_raidflags, d_guid, d_name, d_flags, d_raidflags = CombatLogGetCurrentEventInfo()
 	if event == "SWING_DAMAGE" or event == "RANGE_DAMAGE" or event == "SPELL_DAMAGE" then
 		if FirstDamage[d_guid] == nil then
 			-- s_name is (probably) the player who first damaged this mob and probably has the tag
