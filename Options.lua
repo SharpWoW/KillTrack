@@ -18,6 +18,7 @@
 --]]
 
 local KT = KillTrack
+local KTT = KillTrack_Tools
 
 KT.Options = {
     Panel = CreateFrame("Frame")
