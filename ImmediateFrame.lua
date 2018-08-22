@@ -26,6 +26,8 @@ KT.Immediate = {
 
 local I = KT.Immediate
 
+local frame
+
 local function SetupFrame()
 	if frame then return end
 	local G = KT.Global.IMMEDIATE
