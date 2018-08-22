@@ -342,7 +342,7 @@ function ML:Create()
 	frame.statusLabel:SetWidth(420)
 	frame.statusLabel:SetHeight(16)
 	frame.statusLabel:SetPoint("BOTTOM", frame, "BOTTOM", 0, 8)
-	frame.statusLabel:SetText(STATUS_TEXT:format(1, limit, #Mobs))
+	frame.statusLabel:SetText(STATUS_TEXT:format(1, ROW_COUNT, #Mobs))
 
 	self:UpdateEntries(LastOffset)
 
