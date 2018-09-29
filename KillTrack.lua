@@ -69,6 +69,17 @@ local Units = {
 	"mouseoverpet",
 }
 
+local combat_log_damage_events = {}
+do
+    local prefixes = { "SWING", "RANGE", "SPELL", "SPELL_PERIODIC", "SPELL_BUILDING" }
+    local suffixes = { "DAMAGE", "DRAIN", "LEECH", "INSTAKILL" }
+    for _, prefix in pairs(prefixes) do
+        for _, suffix in pairs(suffixes) do
+            combat_log_damage_events[prefix .. "_" .. suffix] = true
+        end
+    end
+end
+
 for i = 1, 40 do
 	if i <= 4 then
 		Units[#Units + 1] = "party" .. i
@@ -165,7 +176,7 @@ end
 
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
 	local timestamp, event, hideCaster, s_guid, s_name, s_flags, s_raidflags, d_guid, d_name, d_flags, d_raidflags = CombatLogGetCurrentEventInfo()
-	if event == "SWING_DAMAGE" or event == "RANGE_DAMAGE" or event == "SPELL_DAMAGE" then
+	if combat_log_damage_events[event] then
 		if FirstDamage[d_guid] == nil then
 			-- s_name is (probably) the player who first damaged this mob and probably has the tag
 			FirstDamage[d_guid] = s_name
