@@ -9,4 +9,6 @@ script:
   - curl -fsSLo release.sh https://raw.githubusercontent.com/BigWigsMods/packager/master/release.sh
   - chmod +x release.sh
   - ./release.sh
-  - ./release.sh -g 1.13.2
+  - ./release.sh -s -w 0
+  - ./release.sh -g 1.13.2 -w 0
+  - ./release.sh -s -g 1.13.2 -w 0
