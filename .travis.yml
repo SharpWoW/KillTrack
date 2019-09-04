@@ -1,0 +1,13 @@
+language: minimal
+
+addons:
+  apt:
+    packages:
+    - luarocks
+
+install: luarocks install --local luacheck
+
+before_script:
+  - /home/travis/.luarocks/bin/luacheck . -q
+
+script: curl -fsSL https://raw.githubusercontent.com/BigWigsMods/packager/master/release.sh | bash
