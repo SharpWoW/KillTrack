@@ -5,4 +5,8 @@ addons:
     packages:
     - jq
 
-script: curl -fsSL https://raw.githubusercontent.com/BigWigsMods/packager/master/release.sh | bash
+script:
+  - curl -fsSLo release.sh https://raw.githubusercontent.com/BigWigsMods/packager/master/release.sh
+  - chmod +x release.sh
+  - ./release.sh
+  - ./release.sh -g 1.13.2
