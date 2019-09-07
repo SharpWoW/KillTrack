@@ -80,6 +80,13 @@ function Opt:Show()
         end)
     printKills:SetPoint("TOPLEFT", title, "BOTTOMLEFT", -2, -16)
 
+    local tooltipControl = checkbox("Show mob data in tooltip",
+        "With this enabled, KillTrack will print data about mobs in the tooltip",
+        function(check, checked)
+            KT.Global.TOOLTIP = checked
+        end)
+    tooltipControl:SetPoint("LEFT", printKills, "RIGHT", 180, 0)
+
     local printNew = checkbox("Print new mob entries to chat",
         "With this enabled, new mobs added to the database will be announced locally in the chat",
         function(check, checked)
@@ -179,6 +186,7 @@ function Opt:Show()
 
     local function init()
         printKills:SetChecked(KT.Global.PRINT)
+        tooltipControl:SetChecked(KT.Global.TOOLTIP)
         printNew:SetChecked(KT.Global.PRINTNEW)
         countGroup:SetChecked(KT.Global.COUNT_GROUP)
         threshold:SetText(KT.Global.ACHIEV_THRESHOLD)
