@@ -152,7 +152,7 @@ end
 
 function ML:Create()
 	if frame then return end
-	frame = CreateFrame("Frame", nil, UIParent)
+	frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
 	frame:Hide()
 	frame:SetToplevel(true)
 	frame:EnableMouse(true)

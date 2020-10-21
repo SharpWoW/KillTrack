@@ -31,7 +31,7 @@ local frame
 local function SetupFrame()
 	if frame then return end
 	local G = KT.Global.IMMEDIATE
-	frame = CreateFrame("Frame", nil, UIParent)
+	frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
 	frame:Hide()
 	frame:EnableMouse(true)
 	frame:SetMovable(true)
