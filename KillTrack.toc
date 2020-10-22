@@ -30,7 +30,6 @@ Command.lua
 MobList.lua
 Timer.lua
 TimerFrame.lua
-TimerFrame.xml
 ImmediateFrame.lua
 ExpTracker.lua
 Broker.lua

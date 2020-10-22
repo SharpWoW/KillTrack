@@ -37,25 +37,127 @@ local function Toggle(object)
     end
 end
 
-KillTrack.TimerFrame = {
+local KT = KillTrack
+
+KT.TimerFrame = {
     Running = false
 }
 
-local KT = KillTrack
 local TF = KT.TimerFrame
-local T = KillTrack.Timer
+local T = KT.Timer
+
+local frame
+
+local function SetupFrame()
+    if frame then return end
+    frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
+    frame:Hide()
+    frame:EnableMouse(true)
+    frame:SetMovable(true)
+    frame:SetWidth(200)
+    frame:SetHeight(93)
+
+    frame:SetPoint("CENTER")
+
+    local bd = {
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        edgeSize = 16,
+        tileSize = 32,
+        insets = {
+            left = 2.5,
+            right = 2.5,
+            top = 2.5,
+            bottom = 2.5
+        }
+    }
+
+    frame:SetBackdrop(bd)
+
+    frame:SetScript("OnMouseDown", function(f) f:StartMoving() end)
+    frame:SetScript("OnMouseUp", function(f) f:StopMovingOrSizing() end)
+
+    frame.currentLabel = frame:CreateFontString(nil, "OVERLAY", nil)
+    frame.currentLabel:SetFont("Fonts\\FRIZQT__.TTF", 10, nil)
+    frame.currentLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 6, -6)
+    frame.currentLabel:SetText("Number of kills:")
+
+    frame.currentCount = frame:CreateFontString(nil, "OVERLAY", nil)
+    frame.currentCount:SetFont("Fonts\\FRIZQT__.TTF", 10, nil)
+    frame.currentCount:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -6, -6)
+    frame.currentCount:SetText("0")
+
+    frame.timeLabel = frame:CreateFontString(nil, "OVERLAY", nil)
+    frame.timeLabel:SetFont("Fonts\\FRIZQT__.TTF", 10, nil)
+    frame.timeLabel:SetPoint("TOPLEFT", frame.currentLabel, "BOTTOMLEFT", 0, -2)
+    frame.timeLabel:SetText("Time left:")
+
+    frame.timeCount = frame:CreateFontString(nil, "OVERLAY", nil)
+    frame.timeCount:SetFont("Fonts\\FRIZQT__.TTF", 10, nil)
+    frame.timeCount:SetPoint("TOPRIGHT", frame.currentCount, "BOTTOMRIGHT", 0, -2)
+    frame.timeCount:SetText("00:00:00")
+
+    frame.killsPerMinuteLabel = frame:CreateFontString(nil, "OVERLAY", nil)
+    frame.killsPerMinuteLabel:SetFont("Fonts\\FRIZQT__.TTF", 10, nil)
+    frame.killsPerMinuteLabel:SetPoint("TOPLEFT", frame.timeLabel, "BOTTOMLEFT", 0, -2)
+    frame.killsPerMinuteLabel:SetText("Kills Per Minute:")
+
+    frame.killsPerMinuteCount = frame:CreateFontString(nil, "OVERLAY", nil)
+    frame.killsPerMinuteCount:SetFont("Fonts\\FRIZQT__.TTF", 10, nil)
+    frame.killsPerMinuteCount:SetPoint("TOPRIGHT", frame.timeCount, "BOTTOMRIGHT", 0, -2)
+    frame.killsPerMinuteCount:SetText("0")
+
+    frame.killsPerSecondLabel = frame:CreateFontString(nil, "OVERLAY", nil)
+    frame.killsPerSecondLabel:SetFont("Fonts\\FRIZQT__.TTF", 10, nil)
+    frame.killsPerSecondLabel:SetPoint("TOPLEFT", frame.killsPerMinuteLabel, "BOTTOMLEFT", 0, -2)
+    frame.killsPerSecondLabel:SetText("Kills Per Second:")
+
+    frame.killsPerSecondCount = frame:CreateFontString(nil, "OVERLAY", nil)
+    frame.killsPerSecondCount:SetFont("Fonts\\FRIZQT__.TTF", 10, nil)
+    frame.killsPerSecondCount:SetPoint("TOPRIGHT", frame.killsPerMinuteCount, "BOTTOMRIGHT", 0, -2)
+    frame.killsPerSecondCount:SetText("Kills Per Minute:")
+
+    frame.cancelButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.cancelButton:SetSize(60, 16)
+    frame.cancelButton:SetPoint("BOTTOM", frame, "BOTTOM", -40, 7)
+    frame.cancelButton:SetScript("OnLoad", function(self) self:Disable() end)
+    frame.cancelButton:SetScript("OnClick", function() TF:Cancel() end)
+    frame.cancelButton:SetText("Stop")
+
+    frame.closeButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.closeButton:SetSize(60, 16)
+    frame.closeButton:SetPoint("BOTTOM", frame, "BOTTOM", 40, 7)
+    frame.closeButton:SetScript("OnLoad", function(self) self:Disable() end)
+    frame.closeButton:SetScript("OnClick", function() TF:Close() end)
+    frame.closeButton:SetText("Close")
+
+    frame.progressBar = CreateFrame("StatusBar", nil, frame)
+    frame.progressBar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]], "ARTWORK")
+    frame.progressBar:SetStatusBarColor(0, 1, 0)
+    frame.progressBar:SetMinMaxValues(0, 1)
+    frame.progressBar:SetValue(0)
+    frame.progressBar:SetPoint("TOPLEFT", frame.killsPerSecondLabel, "BOTTOMLEFT", -1, -2)
+    frame.progressBar:SetPoint("RIGHT", frame.killsPerSecondCount, "RIGHT", 0, 0)
+    frame.progressBar:SetPoint("BOTTOM", frame.cancelButton, "TOP", 0, 2)
+
+    frame.progressLabel = frame.progressBar:CreateFontString(nil, "OVERLAY", nil)
+    frame.progressLabel:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+    frame.progressLabel:SetAllPoints(frame.progressBar)
+    frame.progressLabel:SetText("0%")
+end
 
 function TF:InitializeControls()
-    KillTrackTimerFrame_CurrentCount:SetText("0")
-    KillTrackTimerFrame_TimeCount:SetText("00:00:00")
-    KillTrackTimerFrame_ProgressLabel:SetText("0%")
-    KillTrackTimerFrame_ProgressBar:SetWidth(0.01)
+    frame.currentCount:SetText("0")
+    frame.timeCount:SetText("00:00:00")
+    frame.progressLabel:SetText("0%")
+    frame.progressBar:SetValue(0)
     self:UpdateControls()
 end
 
 function TF:UpdateControls()
-    Enabled(KillTrackTimerFrame_CancelButton, self.Running)
-    Enabled(KillTrackTimerFrame_CloseButton, not self.Running)
+    Enabled(frame.cancelButton, self.Running)
+    Enabled(frame.closeButton, not self.Running)
 end
 
 function TF:UpdateData(data, state)
@@ -70,12 +172,13 @@ function TF:UpdateData(data, state)
             kpm = kills / (data.Current / 60)
             kps = kills / data.Current
         end
-        KillTrackTimerFrame_CurrentCount:SetText(kills)
-        KillTrackTimerFrame_TimeCount:SetText(data.LeftFormat)
-        KillTrackTimerFrame_ProgressLabel:SetText(floor(data.Progress*100) .. "%")
-        KillTrackTimerFrame_ProgressBar:SetWidth(data.Progress <= 0 and 0.01 or BAR_MAX_WIDTH * data.Progress)
-        KillTrackTimerFrame_KillsPerMinuteCount:SetText(("%.2f"):format(kpm))
-        KillTrackTimerFrame_KillsPerSecondCount:SetText(("%.2f"):format(kps))
+        frame.currentCount:SetText(kills)
+        frame.timeCount:SetText(data.LeftFormat)
+        frame.progressLabel:SetText(floor(data.Progress*100) .. "%")
+        frame.progressBar:SetMinMaxValues(0, data.Total)
+        frame.progressBar:SetValue(data.Current)
+        frame.killsPerMinuteCount:SetText(("%.2f"):format(kpm))
+        frame.killsPerSecondCount:SetText(("%.2f"):format(kps))
         if state == T.State.STOP then self:Stop() end
     end
     self:UpdateControls()
@@ -84,11 +187,12 @@ end
 function TF:Start(s, m, h)
     if self.Running then return end
     self.Running = true
+    SetupFrame()
     self:InitializeControls()
-    KillTrackTimerFrame:Show()
+    frame:Show()
     if not T:Start(s, m, h, function(d, u) TF:UpdateData(d, u) end, nil) then
         self:Stop()
-        KillTrackTimerFrame:Hide()
+        frame:Hide()
     end
 end
 
@@ -102,6 +206,7 @@ function TF:Cancel()
 end
 
 function TF:Close()
+    if not frame then return end
     self:InitializeControls()
-    KillTrackTimerFrame:Hide()
+    frame:Hide()
 end
