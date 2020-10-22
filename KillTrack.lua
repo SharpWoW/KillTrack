@@ -371,7 +371,7 @@ function KT:InitMob(id, name)
         self.CharGlobal.MOBS[id].Name = name
     end
 
-    return self:GetMob(id)
+    return self.Global.MOBS[id], self.CharGlobal.MOBS[id]
 end
 
 function KT:AddKill(id, name)
