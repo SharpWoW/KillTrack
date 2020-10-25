@@ -1,5 +1,5 @@
 --[[
-    * Copyright (c) 2011-2013 by Adam Hellberg.
+    * Copyright (c) 2011-2020 by Adam Hellberg.
     *
     * This file is part of KillTrack.
     *
