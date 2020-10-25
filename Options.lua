@@ -64,7 +64,7 @@ local function HideBlizzOptions()
 end
 
 function Opt:Open()
-    ShowUIPanel(InterfaceOptionsFrame)
+    InterfaceOptionsFrame_OpenToCategory(panel)
     InterfaceOptionsFrame_OpenToCategory(panel)
 end
 
