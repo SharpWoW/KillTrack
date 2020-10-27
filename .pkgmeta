@@ -15,3 +15,5 @@ tools-used:
     - libdatabroker-1-1
 
 license-output: COPYING
+
+enable-nolib-creation: yes
