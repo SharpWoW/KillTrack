@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
       - uses: nebularg/actions-luacheck@v1
         with:
-          args: "--no-color -q"
+          args: "--no-color --codes -q"
           annotate: warning
       - name: Create Retail Package
         uses: BigWigsMods/packager@master
