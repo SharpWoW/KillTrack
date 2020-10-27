@@ -17,7 +17,7 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local KT = KillTrack
+local _, KT = ...
 
 KT.Immediate = {
     Active = false,

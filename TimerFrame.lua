@@ -17,7 +17,14 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local BAR_MAX_WIDTH = 190
+local _, KT = ...
+
+KT.TimerFrame = {
+    Running = false
+}
+
+local TF = KT.TimerFrame
+local T = KT.Timer
 
 local function Enabled(object, enabled)
     if not object.Enable or not object.Disable then return end
@@ -27,24 +34,6 @@ local function Enabled(object, enabled)
         object:Disable()
     end
 end
-
-local function Toggle(object)
-    if not object.IsEnabled or not object.Enable or not object.Disable then return end
-    if object:IsEnabled() then
-        object:Disable()
-    else
-        object:Enable()
-    end
-end
-
-local KT = KillTrack
-
-KT.TimerFrame = {
-    Running = false
-}
-
-local TF = KT.TimerFrame
-local T = KT.Timer
 
 local frame
 

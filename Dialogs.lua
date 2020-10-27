@@ -17,9 +17,9 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local KT = KillTrack
+local _, KT = ...
 
-StaticPopupDialogs["KILLTRACK_FINISH"] = {
+StaticPopupDialogs.KILLTRACK_FINISH = {
     text = "%s entries removed.",
     button1 = "Okay",
     timeout = 10,
@@ -28,7 +28,7 @@ StaticPopupDialogs["KILLTRACK_FINISH"] = {
     hideOnEscape = true
 }
 
-StaticPopupDialogs["KILLTRACK_DELETE"] = {
+StaticPopupDialogs.KILLTRACK_DELETE = {
     text = "Delete %s with ID %s?",
     button1 = "Delete all",
     button2 = "CANCEL",
@@ -41,21 +41,23 @@ StaticPopupDialogs["KILLTRACK_DELETE"] = {
     hideOnEscape = true
 }
 
-StaticPopupDialogs["KILLTRACK_PURGE"] = {
+StaticPopupDialogs.KILLTRACK_PURGE = {
     text = "Remove all mob entries with their kill count below this threshold:",
     button1 = "Purge",
     button2 = "Cancel",
     hasEditBox = true,
-    OnAccept = function(self, data, data2) KT:Purge(tonumber(self.editBox:GetText())) KT.MobList:UpdateMobs() KT.MobList:UpdateEntries() end,
+    OnAccept = function(self)
+        KT:Purge(tonumber(self.editBox:GetText())) KT.MobList:UpdateMobs() KT.MobList:UpdateEntries()
+    end,
     OnCancel = function() KT.Temp.Threshold = nil end,
-    OnShow = function(self, data)
+    OnShow = function(self)
         if tonumber(KT.Temp.Threshold) then
             self.editBox:SetText(tostring(KT.Temp.Threshold))
         else
             self.button1:Disable()
         end
     end,
-    EditBoxOnTextChanged = function(self, data)
+    EditBoxOnTextChanged = function(self)
         if tonumber(self:GetText()) then
             self:GetParent().button1:Enable()
         else
@@ -69,7 +71,7 @@ StaticPopupDialogs["KILLTRACK_PURGE"] = {
     hideOnEscape = true
 }
 
-StaticPopupDialogs["KILLTRACK_RESET"] = {
+StaticPopupDialogs.KILLTRACK_RESET = {
     text = "Remove all mob entries from the database? THIS CANNOT BE REVERSED.",
     button1 = "Yes",
     button2 = "No",

@@ -17,8 +17,8 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local KT = KillTrack
-local KTT = KillTrack_Tools
+local _, KT = ...
+local KTT = KT.Tools
 
 KT.Options = {
     Panel = CreateFrame("Frame")
@@ -35,7 +35,11 @@ panel:Hide()
 local checkCounter = 0
 
 local function checkbox(label, description, onclick)
-    local check = CreateFrame("CheckButton", "KillTrackOptCheck" .. checkCounter, panel, "InterfaceOptionsCheckButtonTemplate")
+    local check = CreateFrame(
+        "CheckButton",
+        "KillTrackOptCheck" .. checkCounter,
+        panel,
+        "InterfaceOptionsCheckButtonTemplate")
     check:SetScript("OnClick", function(self)
         local checked = self:GetChecked()
         PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
@@ -75,30 +79,22 @@ function Opt:Show()
 
     local printKills = checkbox("Print kill updates to chat",
         "With this enabled, every kill you make is going to be announced locally in the chatbox",
-        function(check, checked)
-            KT.Global.PRINT = checked
-        end)
+        function(_, checked) KT.Global.PRINT = checked end)
     printKills:SetPoint("TOPLEFT", title, "BOTTOMLEFT", -2, -16)
 
     local tooltipControl = checkbox("Show mob data in tooltip",
         "With this enabled, KillTrack will print data about mobs in the tooltip",
-        function(check, checked)
-            KT.Global.TOOLTIP = checked
-        end)
+        function(_, checked) KT.Global.TOOLTIP = checked end)
     tooltipControl:SetPoint("LEFT", printKills, "RIGHT", 180, 0)
 
     local printNew = checkbox("Print new mob entries to chat",
         "With this enabled, new mobs added to the database will be announced locally in the chat",
-        function(check, checked)
-            KT.Global.PRINTNEW = checked
-        end)
+        function(_, checked) KT.Global.PRINTNEW = checked end)
     printNew:SetPoint("TOPLEFT", printKills, "BOTTOMLEFT", 0, -8)
 
     local countGroup = checkbox("Count group kills",
         "With this disabled, only killing blows made by yourself will count",
-        function(check, checked)
-            KT.Global.COUNT_GROUP = checked
-        end)
+        function(_, checked) KT.Global.COUNT_GROUP = checked end)
     countGroup:SetPoint("TOPLEFT", printNew, "BOTTOMLEFT", 0, -8)
 
     local thresholdDesc = self:CreateFontString(nil, "ARTWORK", "ChatFontNormal")
@@ -151,37 +147,27 @@ function Opt:Show()
     list:SetPoint("TOPLEFT", showTarget, "TOPRIGHT", 8, 0)
 
     local purge = button("Purge", "Purge mob entries with a kill count below a specified number",
-        function()
-            KT:ShowPurge()
-        end)
+        function() KT:ShowPurge() end)
     purge:SetWidth(150)
     purge:SetPoint("TOPLEFT", showTarget, "BOTTOMLEFT", 0, -8)
 
     local reset = button("Reset", "Clear the database of ALL mob entries",
-        function()
-            KT:ShowReset()
-        end)
+        function() KT:ShowReset() end)
     reset:SetWidth(150)
     reset:SetPoint("TOPLEFT", purge, "TOPRIGHT", 8, 0)
 
     local minimap = checkbox("Show minimap icon", "Adds the KillTrack broker to your minimap",
-        function(check, checked)
-            KT.Broker:SetMinimap(checked)
-        end)
+        function(_, checked) KT.Broker:SetMinimap(checked) end)
     minimap:SetPoint("TOPLEFT", purge, "BOTTOMLEFT", 0, -8)
 
     local disableDungeons = checkbox("Disable in dungeons (save CPU)",
         "When this is checked, mob kills in dungeons won't be counted.",
-        function(check, checked)
-            KT.Global.DISABLE_DUNGEONS = checked
-        end)
+        function(_, checked) KT.Global.DISABLE_DUNGEONS = checked end)
     disableDungeons:SetPoint("TOPLEFT", minimap, "BOTTOMLEFT", 0, -8)
 
     local disableRaids = checkbox("Disable in raids (save CPU)",
         "When this is checked, mob kills in raids won't be counted.",
-        function(check, checked)
-            KT.Global.DISABLE_RAIDS = checked
-        end)
+        function(_, checked) KT.Global.DISABLE_RAIDS = checked end)
     disableRaids:SetPoint("TOPLEFT", disableDungeons, "BOTTOMLEFT", 0, -8)
 
     local function init()

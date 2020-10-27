@@ -17,7 +17,9 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-KillTrack.Timer = {
+local _, KT = ...
+
+KT.Timer = {
     Time = {
         Start = 0,
         Stop = 0
@@ -30,19 +32,11 @@ KillTrack.Timer = {
     }
 }
 
-local KT = KillTrack
 local T = KT.Timer
 
-local KTT = KillTrack_Tools
+local KTT = KT.Tools
 
 local TimerData = {}
-
-local function FormatTime(s)
-    local h = floor(s/60/60)
-    local m = floor(s/60) - h * 60
-    s = s - h * 60 ^ 2 - m * 60
-    return ("%02.0f:%02.0f:%02.0f"):format(h, m, s)
-end
 
 T.Frame = CreateFrame("Frame")
 

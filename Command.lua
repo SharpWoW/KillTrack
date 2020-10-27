@@ -17,7 +17,9 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-KillTrack.Command = {
+local _, KT = ...
+
+KT.Command = {
     Slash = {
         "killtrack",
         "kt"
@@ -25,11 +27,8 @@ KillTrack.Command = {
     Commands = {}
 }
 
-local KT = KillTrack
 local C = KT.Command
-local KTT = KillTrack_Tools
-
---local CLib = ChocoboLib
+local KTT = KT.Tools
 
 -- Argument #1 (command) can be either string or a table.
 function C:Register(command, func)
@@ -65,7 +64,7 @@ function C:HandleCommand(command, args)
     end
 end
 
-C:Register("__DEFAULT__", function(args)
+C:Register("__DEFAULT__", function()
     KT:Msg("/kt target - Display number of kills on target mob.")
     KT:Msg("/kt lookup <name> - Display number of kills on <name>, <name> can also be NPC ID.")
     KT:Msg("/kt print - Toggle printing kill updates to chat.")
@@ -82,13 +81,13 @@ C:Register("__DEFAULT__", function(args)
     KT:Msg("/kt - Displays this help message.")
 end)
 
-C:Register({"target", "t", "tar"}, function(args)
+C:Register({"target", "t", "tar"}, function()
     if not UnitExists("target") or UnitIsPlayer("target") then return end
     local id = KTT:GUIDToID(UnitGUID("target"))
     KT:PrintKills(id)
 end)
 
-C:Register({"print", "p"}, function(args)
+C:Register({"print", "p"}, function()
     KT.Global.PRINTKILLS = not KT.Global.PRINTKILLS
     if KT.Global.PRINTKILLS then
         KT:Msg("Announcing kill updates.")
@@ -97,7 +96,7 @@ C:Register({"print", "p"}, function(args)
     end
 end)
 
-C:Register({"printnew", "pn"}, function(args)
+C:Register({"printnew", "pn"}, function()
     KT.Global.PRINTNEW = not KT.Global.PRINTNEW
     if KT.Global.PRINTNEW then
         KT:Msg("Announcing new mob entries")
@@ -130,9 +129,7 @@ C:Register({"purge"}, function(args)
     KT:ShowPurge(threshold)
 end)
 
-C:Register({"reset", "r"}, function(args)
-    KT:ShowReset()
-end)
+C:Register({"reset", "r"}, function() KT:ShowReset() end)
 
 C:Register({"lookup", "lo", "check"}, function(args)
     if #args <= 0 then
@@ -143,9 +140,7 @@ C:Register({"lookup", "lo", "check"}, function(args)
     KT:PrintKills(name)
 end)
 
-C:Register({"list", "moblist", "mobs"}, function(args)
-    KT.MobList:Show()
-end)
+C:Register({"list", "moblist", "mobs"}, function() KT.MobList:Show() end)
 
 C:Register({"time", "timer"}, function(args)
     if #args <= 0 then
@@ -218,27 +213,13 @@ C:Register({"threshold"}, function(args)
     end
 end)
 
-C:Register({"countmode", "cm", "count", "counttype", "changecount", "switchcount"}, function(args)
-    KT:ToggleCountMode()
-end)
+C:Register({"countmode", "cm", "count", "counttype", "changecount", "switchcount"}, function() KT:ToggleCountMode() end)
+C:Register({"debug", "toggledebug", "d", "td"}, function() KT:ToggleDebug() end)
+C:Register({"exp", "xp", "experience", "shoexp", "showxp"}, function() KT:ToggleExp() end)
+C:Register({"options", "opt", "config", "conf"}, function() KT.Options:Open() end)
+C:Register({"minimap", "mp"}, function() KT.Broker:SetMinimap(not KT.Global.BROKER.MINIMAP.hide) end)
 
-C:Register({"debug", "toggledebug", "d", "td"}, function(args)
-    KT:ToggleDebug()
-end)
-
-C:Register({"exp", "xp", "experience", "shoexp", "showxp"}, function(args)
-    KT:ToggleExp()
-end)
-
-C:Register({"options", "opt", "config", "conf"}, function(args)
-    KT.Options:Open()
-end)
-
-C:Register({"minimap", "mp"}, function(args)
-    KT.Broker:SetMinimap(not KT.Global.BROKER.MINIMAP.hide)
-end)
-
-C:Register({"tooltip", "tt"}, function(args)
+C:Register({"tooltip", "tt"}, function()
     KT.Global.TOOLTIP = not KT.Global.TOOLTIP
     KT:Msg("Tooltip data " .. (KT.Global.TOOLTIP and "enabled" or "disabled"))
 end)
@@ -247,7 +228,7 @@ for i,v in ipairs(C.Slash) do
     _G["SLASH_" .. KT.Name:upper() .. i] = "/" .. v
 end
 
-SlashCmdList[KT.Name:upper()] = function(msg, editBox)
+SlashCmdList[KT.Name:upper()] = function(msg)
     msg = KTT:Trim(msg)
     local args = KTT:Split(msg)
     local cmd = args[1]

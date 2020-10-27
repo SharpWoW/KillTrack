@@ -17,9 +17,11 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-KillTrack_Tools = {}
+local _, KT = ...
 
-local KTT = KillTrack_Tools
+KT.Tools = {}
+
+local KTT = KT.Tools
 
 ------------------
 -- NUMBER TOOLS --
@@ -28,7 +30,7 @@ local KTT = KillTrack_Tools
 function KTT:FormatSeconds(seconds)
     local hours = floor(seconds / 3600)
     local minutes = floor(seconds / 60) - hours * 60
-    local seconds = seconds - minutes * 60 - hours * 3600
+    seconds = seconds - minutes * 60 - hours * 3600
     return ("%02d:%02d:%02d"):format(hours, minutes, seconds)
 end
 
@@ -73,7 +75,7 @@ end
 
 function KTT:TableLength(table)
     local count = 0
-    for _,_ in pairs(table) do
+    for _, _ in pairs(table) do
         count = count + 1
     end
     return count

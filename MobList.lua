@@ -19,17 +19,17 @@
 
 -- Beware of some possibly messy code in this file
 
-KillTrack.MobList = {}
+local _, KT = ...
 
-local KT = KillTrack
+KT.MobList = {}
+
 local ML = KT.MobList
-local KTT = KillTrack_Tools
+local KTT = KT.Tools
 
 local Sort = KT.Sort.Desc
 local Mobs = nil
 local LastFilter = nil
 local LastOffset = 0
-local TotalMobs = 0
 
 -- Frame Constants
 local FRAME_WIDTH = 600
@@ -40,7 +40,6 @@ local HEADER_TOP = -80
 local ROW_HEIGHT = 15
 local ROW_COUNT = 27
 local ROW_TEXT_PADDING = 5
-local ROWS_HEIGHT = 450
 local ID_WIDTH = 100
 local NAME_WIDTH = 300
 local CHAR_WIDTH = 100
@@ -189,7 +188,7 @@ function ML:Create()
 
     frame.closeButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
     frame.closeButton:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, -1)
-    frame.closeButton:SetScript("OnClick", function(s) ML:Hide() end)
+    frame.closeButton:SetScript("OnClick", function() ML:Hide() end)
 
     frame.purgeButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     frame.purgeButton:SetHeight(24)
@@ -215,13 +214,14 @@ function ML:Create()
     frame.helpLabel:SetPoint("TOP", frame, "TOP", 0, -28)
     frame.helpLabel:SetWordWrap(true)
     frame.helpLabel:SetMaxLines(2)
-    frame.helpLabel:SetText("Click on an individual entry to delete it from the database. Use the search to filter database by name.")
+    frame.helpLabel:SetText(
+        "Click on an individual entry to delete it from the database. Use the search to filter database by name.")
 
     frame.searchBox = CreateFrame("EditBox", "KillTrackMobListSearchBox", frame, "SearchBoxTemplate")
     frame.searchBox:SetWidth(200)
     frame.searchBox:SetHeight(16)
     frame.searchBox:SetPoint("TOPLEFT", frame.resetButton, "BOTTOMLEFT", 8, -3)
-    frame.searchBox:SetScript("OnTextChanged", function(s, c)
+    frame.searchBox:SetScript("OnTextChanged", function(s)
         local text = s:GetText()
         if (not _G[s:GetName() .. "ClearButton"]:IsShown()) then
             text = nil
@@ -235,8 +235,9 @@ function ML:Create()
         ML:UpdateEntries(LastOffset)
     end)
     frame.searchBox:SetScript("OnEnterPressed", function(s) s:ClearFocus() end)
-    local sBoxOldFunc = KillTrackMobListSearchBoxClearButton:GetScript("OnHide")
-    KillTrackMobListSearchBoxClearButton:SetScript("OnHide", function(s)
+    frame.searchBox.clearButton = _G[frame.searchBox:GetName() .. "ClearButton"]
+    local sBoxOldFunc = frame.searchBox.clearButton:GetScript("OnHide")
+    frame.searchBox.clearButton:SetScript("OnHide", function(s)
         if sBoxOldFunc then sBoxOldFunc(s) end
         if not frame:IsShown() then return end
         ML:UpdateMobs(Sort, nil)
@@ -319,7 +320,12 @@ function ML:Create()
         previous = frame.rows[key]
     end
 
-    frame.rows.scroller = CreateFrame("ScrollFrame", "KillTrackMobListScrollFrame", frame.rows, "FauxScrollFrameTemplateLight")
+    frame.rows.scroller = CreateFrame(
+        "ScrollFrame",
+        "KillTrackMobListScrollFrame",
+        frame.rows,
+        "FauxScrollFrameTemplateLight")
+    frame.rows.scroller.name = frame.rows.scroller:GetName()
     frame.rows.scroller:SetWidth(frame.rows:GetWidth())
     frame.rows.scroller:SetPoint("TOPRIGHT", frame.rows, "TOPRIGHT", -1, -2)
     frame.rows.scroller:SetPoint("BOTTOMRIGHT", 0, 4)
@@ -329,7 +335,7 @@ function ML:Create()
             FauxScrollFrame_OnVerticalScroll(
                 s, val, ROW_HEIGHT,
                 function()
-                    local offset = FauxScrollFrame_GetOffset(KillTrackMobListScrollFrame)
+                    local offset = FauxScrollFrame_GetOffset(frame.rows.scroller)
                     ML:UpdateEntries(offset)
                 end
             )
@@ -355,7 +361,7 @@ function ML:UpdateMobs(sort, filter)
     Sort = sort
     LastFilter = filter
     Mobs = KT:GetSortedMobTable(Sort, filter and filter:lower() or nil)
-    FauxScrollFrame_Update(KillTrackMobListScrollFrame, #Mobs, ROW_COUNT, ROW_HEIGHT)
+    FauxScrollFrame_Update(frame.rows.scroller, #Mobs, ROW_COUNT, ROW_HEIGHT)
 end
 
 function ML:UpdateEntries(offset)
@@ -402,17 +408,19 @@ function ML:UpdateEntries(offset)
         row:Enable()
     end
 
-    frame.statusLabel:SetText(STATUS_TEXT:format(1 + offset, math.min(#Mobs, offset + ROW_COUNT), #Mobs, KTT:TableLength(KT.Global.MOBS) - #Mobs))
+    local mobCount = KTT:TableLength(KT.Global.MOBS)
+    local hidden = mobCount - #Mobs
+    frame.statusLabel:SetText(STATUS_TEXT:format(1 + offset, math.min(#Mobs, offset + ROW_COUNT), #Mobs, hidden))
 
     if offset == 0 then
-        KillTrackMobListScrollFrameScrollBarScrollUpButton:Disable()
+        _G[frame.rows.scroller.name .. "ScrollBarScrollUpButton"]:Disable()
     else
-        KillTrackMobListScrollFrameScrollBarScrollUpButton:Enable()
+        _G[frame.rows.scroller.name .. "ScrollBarScrollUpButton"]:Enable()
     end
 
     if offset + ROW_COUNT == #Mobs then
-        KillTrackMobListScrollFrameScrollBarScrollDownButton:Disable()
+        _G[frame.rows.scroller.name .. "ScrollBarScrollDownButton"]:Disable()
     else
-        KillTrackMobListScrollFrameScrollBarScrollDownButton:Enable()
+        _G[frame.rows.scroller.name .. "ScrollBarScrollDownButton"]:Enable()
     end
 end

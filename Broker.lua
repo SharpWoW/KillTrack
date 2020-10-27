@@ -17,7 +17,7 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local KT = KillTrack
+local _, KT = ...
 
 KT.Broker = {
     Text = {
@@ -26,7 +26,7 @@ KT.Broker = {
     }
 }
 
-local KTT = KillTrack_Tools
+local KTT = KT.Tools
 local KTB = KT.Broker
 
 local UPDATE = 1
@@ -74,7 +74,7 @@ function obj:OnTooltipShow()
     self:AddLine(" ")
     self:AddDoubleLine("Kills this session", ("|cffFFFFFF%d|r"):format(KT.Session.Count), 1, 1, 0)
     local added = 0
-    for i,v in pairs(KT:GetSortedSessionKills()) do
+    for _, v in pairs(KT:GetSortedSessionKills()) do
         self:AddDoubleLine(v.Name, ("|cffFFFFFF%d|r"):format(v.Kills))
         added = added + 1
     end
@@ -83,8 +83,8 @@ function obj:OnTooltipShow()
     end
     self:AddLine(" ")
     self:AddDoubleLine("Kills in total", ("|cffFFFFFF%d|r"):format(KT:GetTotalKills()), 1, 1, 0)
-    local added = 0
-    for _,v in pairs(KT:GetSortedMobTable()) do
+    added = 0
+    for _, v in pairs(KT:GetSortedMobTable()) do
         self:AddDoubleLine(v.Name, ("|cffFFFFFF%d (%d)|r"):format(v.cKills, v.gKills))
         added = added + 1
         if added >= 3 then break end
@@ -132,7 +132,7 @@ function KTB:UpdateTooltip()
     GameTooltip:Show()
 end
 
-function KTB:OnUpdate(frame, elapsed)
+function KTB:OnUpdate(_, elapsed)
     t = t + elapsed
     if t >= UPDATE then
         self:UpdateText()
@@ -151,7 +151,7 @@ function KTB:OnLoad()
         KT.Global.BROKER.MINIMAP.hide = true
     end
     icon:Register(KT.Name, obj, KT.Global.BROKER.MINIMAP)
-    frame:SetScript("OnUpdate", function(self, elapsed) KTB:OnUpdate(self, elapsed) end)
+    frame:SetScript("OnUpdate", function(f, elapsed) KTB:OnUpdate(f, elapsed) end)
     self:UpdateText()
 end
 

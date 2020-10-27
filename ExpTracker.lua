@@ -17,25 +17,25 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local KT = KillTrack
+local _, KT = ...
 
 KT.ExpTracker = {
     Strings = {
-        COMBATLOG_XPGAIN_EXHAUSTION1,       -- "%s dies, you gain %d experience. (%s exp %s bonus)";
-        COMBATLOG_XPGAIN_EXHAUSTION1_GROUP, -- "%s dies, you gain %d experience. (%s exp %s bonus, +%d group bonus)";
-        COMBATLOG_XPGAIN_EXHAUSTION1_RAID,  -- "%s dies, you gain %d experience. (%s exp %s bonus, -%d raid penalty)";
-        COMBATLOG_XPGAIN_EXHAUSTION2,       -- "%s dies, you gain %d experience. (%s exp %s bonus)";
-        COMBATLOG_XPGAIN_EXHAUSTION2_GROUP, -- "%s dies, you gain %d experience. (%s exp %s bonus, +%d group bonus)";
-        COMBATLOG_XPGAIN_EXHAUSTION2_RAID,  -- "%s dies, you gain %d experience. (%s exp %s bonus, -%d raid penalty)";
-        COMBATLOG_XPGAIN_EXHAUSTION4,       -- "%s dies, you gain %d experience. (%s exp %s penalty)";
-        COMBATLOG_XPGAIN_EXHAUSTION4_GROUP, -- "%s dies, you gain %d experience. (%s exp %s penalty, +%d group bonus)";
-        COMBATLOG_XPGAIN_EXHAUSTION4_RAID,  -- "%s dies, you gain %d experience. (%s exp %s penalty, -%d raid penalty)";
-        COMBATLOG_XPGAIN_EXHAUSTION5,       -- "%s dies, you gain %d experience. (%s exp %s penalty)";
-        COMBATLOG_XPGAIN_EXHAUSTION5_GROUP, -- "%s dies, you gain %d experience. (%s exp %s penalty, +%d group bonus)";
-        COMBATLOG_XPGAIN_EXHAUSTION5_RAID,  -- "%s dies, you gain %d experience. (%s exp %s penalty, -%d raid penalty)";
-        COMBATLOG_XPGAIN_FIRSTPERSON,       -- "%s dies, you gain %d experience.";
-        COMBATLOG_XPGAIN_FIRSTPERSON_GROUP, -- "%s dies, you gain %d experience. (+%d group bonus)";
-        COMBATLOG_XPGAIN_FIRSTPERSON_RAID   -- "%s dies, you gain %d experience. (-%d raid penalty)";
+        _G.COMBATLOG_XPGAIN_EXHAUSTION1,       -- %s dies, you gain %d experience. (%s exp %s bonus)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION1_GROUP, -- %s dies, you gain %d experience. (%s exp %s bonus, +%d group bonus)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION1_RAID,  -- %s dies, you gain %d experience. (%s exp %s bonus, -%d raid penalty)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION2,       -- %s dies, you gain %d experience. (%s exp %s bonus)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION2_GROUP, -- %s dies, you gain %d experience. (%s exp %s bonus, +%d group bonus)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION2_RAID,  -- %s dies, you gain %d experience. (%s exp %s bonus, -%d raid penalty)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION4,       -- %s dies, you gain %d experience. (%s exp %s penalty)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION4_GROUP, -- %s dies, you gain %d experience. (%s exp %s penalty, +%d group bonus)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION4_RAID,  -- %s dies, you gain %d experience. (%s exp %s penalty, -%d raid penalty)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION5,       -- %s dies, you gain %d experience. (%s exp %s penalty)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION5_GROUP, -- %s dies, you gain %d experience. (%s exp %s penalty, +%d group bonus)
+        _G.COMBATLOG_XPGAIN_EXHAUSTION5_RAID,  -- %s dies, you gain %d experience. (%s exp %s penalty, -%d raid penalty)
+        _G.COMBATLOG_XPGAIN_FIRSTPERSON,       -- %s dies, you gain %d experience.
+        _G.COMBATLOG_XPGAIN_FIRSTPERSON_GROUP, -- %s dies, you gain %d experience. (+%d group bonus)
+        _G.COMBATLOG_XPGAIN_FIRSTPERSON_RAID   -- %s dies, you gain %d experience. (-%d raid penalty)
     }
 }
 
