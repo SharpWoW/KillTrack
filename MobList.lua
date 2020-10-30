@@ -357,7 +357,6 @@ end
 
 function ML:UpdateMobs(sort, filter)
     sort = (sort or Sort) or KT.Sort.Desc
-    if Mobs and sort == Sort and filter == LastFilter then return end -- No update needed
     Sort = sort
     LastFilter = filter
     Mobs = KT:GetSortedMobTable(Sort, filter and filter:lower() or nil)
