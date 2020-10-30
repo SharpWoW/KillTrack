@@ -1,6 +1,8 @@
 KillTrack
 =========
 
+[![Build status](https://github.com/SharpWoW/KillTrack/workflows/Build/badge.svg)](https://github.com/SharpWoW/KillTrack/actions?query=workflow%3ABuild)
+
 KillTrack will keep track of how many times you've killed various mobs.
 
 The main way to see this info is on tooltips. As you hover over any killable mob, the kill count will be displayed on the bottom of the tooltip.
