@@ -26,6 +26,8 @@ local UnitGUID = UnitGUID
 local UnitIsTapDenied = UnitIsTapDenied
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 
+local NO_NAME = "<No Name>"
+
 KT.Name = NAME
 KT.Version = GetAddOnMetadata(NAME, "Version")
 KT.Events = {}
@@ -352,7 +354,7 @@ function KT:ToggleCountMode()
 end
 
 function KT:InitMob(id, name)
-    name = name or "<No Name>"
+    name = name or NO_NAME
 
     if type(self.Global.MOBS[id]) ~= "table" then
         self.Global.MOBS[id] = { Name = name, Kills = 0, AchievCount = 0 }
@@ -376,7 +378,7 @@ function KT:InitMob(id, name)
 end
 
 function KT:AddKill(id, name)
-    name = name or "<No Name>"
+    name = name or NO_NAME
     self:InitMob(id, name)
     self.Global.MOBS[id].Kills = self.Global.MOBS[id].Kills + 1
     self.CharGlobal.MOBS[id].Kills = self.CharGlobal.MOBS[id].Kills + 1
@@ -488,10 +490,10 @@ end
 
 function KT:PrintKills(identifier)
     local found = false
-    local name = "<No Name>"
+    local name = NO_NAME
     local gKills = 0
     local cKills = 0
-    if type(identifier) ~= "string" and type(identifier) ~= "number" then identifier = "<No Name>" end
+    if type(identifier) ~= "string" and type(identifier) ~= "number" then identifier = NO_NAME end
     for k,v in pairs(self.Global.MOBS) do
         if type(v) == "table" and (tostring(k) == tostring(identifier) or v.Name == identifier) then
             name = v.Name
