@@ -418,6 +418,28 @@ function KT:AddKill(id, name)
     end
 end
 
+function KT:SetKills(id, name, globalCount, charCount)
+    if type(id) ~= "number" then
+        error("'id' argument must be a number")
+    end
+
+    if type(globalCount) ~= "number" then
+        error("'globalCount' argument must be a number")
+    end
+
+    if type(charCount) ~= "number" then
+        error("'charCount' argument must be a number")
+    end
+
+    name = name or NO_NAME
+
+    self:InitMob(id, name)
+    self.Global.MOBS[id].Kills = globalCount
+    self.CharGlobal.MOBS[id].Kills = charCount
+
+    self:Msg(("Updated %q to %d global and %d character kills"):format(name, globalCount, charCount))
+end
+
 function KT:AddSessionKill(name)
     if self.Session.Kills[name] then
         self.Session.Kills[name] = self.Session.Kills[name] + 1

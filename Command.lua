@@ -69,6 +69,7 @@ C:Register("__DEFAULT__", function()
     KT:Msg("/kt lookup <name> - Display number of kills on <name>, <name> can also be NPC ID.")
     KT:Msg("/kt print - Toggle printing kill updates to chat.")
     KT:Msg("/kt list - Display a list of all mobs entries.")
+    KT:Msg("/kt set <id> <name> <global> <char> - Set kill counts for a mob")
     KT:Msg("/kt delete <id> - Delete entry with NPC id <id>.")
     KT:Msg("/kt purge [threshold] - Open dialog to purge entries, specifiying a threshold here is optional.")
     KT:Msg("/kt reset - Clear the mob database.")
@@ -103,6 +104,42 @@ C:Register({"printnew", "pn"}, function()
     else
         KT:Msg("No longer announcing new mob entries")
     end
+end)
+
+C:Register({"set", "edit"}, function(args)
+    local id = tonumber(args[1])
+    local name = args[2]
+    local global = tonumber(args[3])
+    local char = tonumber(args[4])
+
+    local err
+
+    if not id then
+        KT:Msg("Missing or invalid argument: id")
+        err = true
+    end
+
+    if not name then
+        KT:Msg("Missing or invalid argument: name")
+        err = true
+    end
+
+    if not global then
+        KT:Msg("Missing or invalid argument: global")
+        err = true
+    end
+
+    if not char then
+        KT:Msg("Missing or invalid argument: char")
+        err = true
+    end
+
+    if err then
+        KT:Msg("Usage: /kt set <id> <name> <global> <char>")
+        return
+    end
+
+    KT:SetKills(id, name, global, char)
 end)
 
 C:Register({"delete", "del", "remove", "rem"}, function(args)
