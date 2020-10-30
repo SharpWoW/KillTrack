@@ -221,7 +221,7 @@ function ML:Create()
     frame.searchBox:SetWidth(200)
     frame.searchBox:SetHeight(16)
     frame.searchBox:SetPoint("TOPLEFT", frame.resetButton, "BOTTOMLEFT", 8, -3)
-    frame.searchBox:SetScript("OnTextChanged", function(s)
+    frame.searchBox:HookScript("OnTextChanged", function(s)
         local text = s:GetText()
         if (not _G[s:GetName() .. "ClearButton"]:IsShown()) then
             text = nil
