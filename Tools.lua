@@ -44,8 +44,28 @@ end
 
 function KTT:Split(s)
     local r = {}
-    for token in string.gmatch(s, "[^%s]+") do
-        table.insert(r, token)
+    local tokpat = "%S+"
+    local spat = [=[^(['"])]=]
+    local epat = [=[(['"])$]=]
+    local escpat = [=[(\*)['"]$]=]
+    local buf, quoted
+    for token in string.gmatch(s, tokpat) do
+        local squoted = token:match(spat)
+        local equoted = token:match(epat)
+        local escaped = token:match(escpat)
+        if squoted and not quoted and not equoted then
+            buf, quoted = token, squoted
+        elseif buf and equoted == quoted and #escaped % 2 == 0 then
+            token, buf, quoted = buf .. " "  .. token, nil, nil
+        elseif buf then
+            buf = buf .. " " .. token
+        end
+        if not buf then
+            r[#r + 1] = token:gsub(spat, ""):gsub(epat, ""):gsub([[\(.)]], "%1")
+        end
+    end
+    if buf then
+        r[#r + 1] = buf
     end
     return r
 end

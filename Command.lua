@@ -234,8 +234,8 @@ SlashCmdList[KT.Name:upper()] = function(msg)
     local cmd = args[1]
     local t = {}
     if #args > 1 then
-        for i=2,#args do
-            table.insert(t, args[i])
+        for i = 2, #args do
+            t[#t + 1] = args[i]
         end
     end
     C:HandleCommand(cmd, t)
