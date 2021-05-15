@@ -38,7 +38,7 @@ jobs:
         uses: BigWigsMods/packager@master
         with:
           # WoWInterface doesn't currently support BC Classic
-          args: "-g bc -w 0"
+          args: "-g bcc -w 0"
         env:
           CF_API_KEY: ${{ secrets.CF_API_TOKEN }}
           WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
