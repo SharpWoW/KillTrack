@@ -247,27 +247,6 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     end
 end
 
-function KT.Events.UPDATE_MOUSEOVER_UNIT(self)
-    if not self.Global.TOOLTIP then return end
-    if UnitIsPlayer("mouseover") then return end
-    local id = KTT:GUIDToID(UnitGUID("mouseover"))
-    if not id then return end
-    if UnitCanAttack("player", "mouseover") then
-        local mob, charMob = self:InitMob(id, UnitName("mouseover"))
-        local gKills, cKills = mob.Kills, charMob.Kills --self:GetKills(id)
-        local exp = mob.Exp
-        GameTooltip:AddLine(("Killed %d (%d) times."):format(cKills, gKills), 1, 1, 1)
-        if self.Global.SHOW_EXP and exp then
-            local toLevel = exp > 0 and math.ceil((UnitXPMax("player") - UnitXP("player")) / exp) or "N/A"
-            GameTooltip:AddLine(("EXP: %d (%s kills to level)"):format(exp, toLevel), 1, 1, 1)
-        end
-    end
-    if KT.Debug then
-        GameTooltip:AddLine(("ID = %d"):format(id))
-    end
-    GameTooltip:Show()
-end
-
 function KT.Events.CHAT_MSG_COMBAT_XP_GAIN(self, message)
     ET:CheckMessage(message)
 end
@@ -287,6 +266,29 @@ function KT.Events.ENCOUNTER_END(self, _, _, _, size)
         self.Frame:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
     end
 end
+
+GameTooltip:HookScript("OnTooltipSetUnit", function(self)
+    if not KT.Global.TOOLTIP then return end
+    local _, unit = self:GetUnit()
+    if not unit then return end
+    if UnitIsPlayer(unit) then return end
+    local id = KTT:GUIDToID(UnitGUID(unit))
+    if not id then return end
+    if UnitCanAttack("player", unit) then
+        local mob, charMob = KT:InitMob(id, UnitName(unit))
+        local gKills, cKills = mob.Kills, charMob.Kills --self:GetKills(id)
+        local exp = mob.Exp
+        self:AddLine(("Killed %d (%d) times."):format(cKills, gKills), 1, 1, 1)
+        if KT.Global.SHOW_EXP and exp then
+            local toLevel = exp > 0 and math.ceil((UnitXPMax("player") - UnitXP("player")) / exp) or "N/A"
+            self:AddLine(("EXP: %d (%s kills to level)"):format(exp, toLevel), 1, 1, 1)
+        end
+    end
+    if KT.Debug then
+        self:AddLine(("ID = %d"):format(id))
+    end
+    self:Show()
+end)
 
 function KT:ToggleLoadMessage()
     self.Global.LOAD_MESSAGE = not self.Global.LOAD_MESSAGE
