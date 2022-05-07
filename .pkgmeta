@@ -2,13 +2,13 @@ package-as: KillTrack
 
 externals:
     libs/LibStub:
-        url: svn://svn.wowace.com/wow/libstub/mainline/trunk
+        url: https://repos.wowace.com/wow/libstub/trunk
         tag: latest
     libs/CallbackHandler-1.0:
-        url: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
+        url: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
         tag: latest
     libs/LibDBIcon-1.0:
-        url: svn://svn.wowace.com/wow/libdbicon-1-0/mainline/trunk
+        url: https://repos.wowace.com/wow/libdbicon-1-0/trunk
         tag: latest
 
 tools-used:
