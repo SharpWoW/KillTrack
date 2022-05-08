@@ -25,3 +25,8 @@ jobs:
           WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
           WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+      - name: Store package in build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: addon
+          path: '.release/KillTrack-*.zip'
