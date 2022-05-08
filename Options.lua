@@ -97,8 +97,9 @@ function Opt:Show()
         function(_, checked) KT.Global.COUNT_GROUP = checked end)
     countGroup:SetPoint("TOPLEFT", printNew, "BOTTOMLEFT", 0, -8)
 
-    local thresholdDesc = self:CreateFontString(nil, "ARTWORK", "ChatFontNormal")
+    local thresholdDesc = self:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     thresholdDesc:SetPoint("TOPLEFT", countGroup, "BOTTOMLEFT", 0, -8)
+    thresholdDesc:SetTextColor(1, 1, 1)
     thresholdDesc:SetText("Threshold for displaying kill achievements (press enter to apply)")
 
     local threshold = CreateFrame("EditBox", "KillTrackOptThreshold", panel, "InputBoxTemplate")
