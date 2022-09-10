@@ -1,6 +1,6 @@
-## Interface: 90200
-## Interface-Classic: 11402
-## Interface-BCC: 20504
+## Interface: 90207
+## Interface-Classic: 11403
+## Interface-Wrath: 30400
 ## Version: @project-version@
 ## Title: KillTrack
 ## Notes: Keeps track of how many kills you have per mob and displays them in a list.
