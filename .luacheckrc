@@ -67,7 +67,9 @@ stds.wow = {
     "UnitName",
     "UnitXP",
     "UnitXPMax",
-    "wipe"
+    "wipe",
+    "WOW_PROJECT_ID",
+    "WOW_PROJECT_MAINLINE"
   }
 }
 
