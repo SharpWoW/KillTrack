@@ -275,7 +275,7 @@ function KT.Events.ENCOUNTER_END(self, _, _, _, size)
     end
 end
 
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit,function(self, data)
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(self)
     if not KT.Global.TOOLTIP then return end
     local _, unit = self:GetUnit()
     if not unit then return end
