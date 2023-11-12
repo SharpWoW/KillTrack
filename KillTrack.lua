@@ -230,7 +230,13 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     local pass
 
     if self.Debug then
-        self:DebugMsg(("CLEU - %s: SRC[%s (%s)] DST[%s (%s)]"):format(event, tostring(s_guid), tostring(s_name), tostring(d_guid), tostring(d_name)))
+        self:DebugMsg(
+            ("CLEU - %s: SRC[%s (%s)] DST[%s (%s)]"):format(
+                event,
+                tostring(s_guid),
+                tostring(s_name),
+                tostring(d_guid),
+                tostring(d_name)))
         self:DebugMsg("d_id = " .. tostring(d_id))
         self:DebugMsg("firstDamage = " .. firstDamage)
         self:DebugMsg("lastDamage = " .. lastDamage)

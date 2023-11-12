@@ -44,6 +44,7 @@ stds.wow = {
     "InterfaceOptionsFrame_OpenToCategory",
     "IsAddOnLoaded",
     "IsControlKeyDown",
+    "IsGUIDInGroup",
     "IsInGroup",
     "IsInRaid",
     "IsShiftKeyDown",
