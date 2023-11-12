@@ -229,22 +229,6 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     local lastByPlayer = lastDamage == self.PlayerGUID or lastDamage == UnitGUID("pet")
     local pass
 
-    if self.Debug then
-        self:DebugMsg(
-            ("CLEU - %s: SRC[%s (%s)] DST[%s (%s)]"):format(
-                event,
-                tostring(s_guid),
-                tostring(s_name),
-                tostring(d_guid),
-                tostring(d_name)))
-        self:DebugMsg("d_id = " .. tostring(d_id))
-        self:DebugMsg("firstDamage = " .. firstDamage)
-        self:DebugMsg("lastDamage = " .. lastDamage)
-        self:DebugMsg("firstByPlayer = " .. tostring(firstByPlayer))
-        self:DebugMsg("firstByGroup = " .. tostring(firstByGroup))
-        self:DebugMsg("lastByPlayer = " .. tostring(lastByPlayer))
-    end
-
     -- All checks after DamageValid should be safe to remove
     -- The checks after DamageValid are also not 100% failsafe
     -- Scenario: You deal the killing blow to an already tapped mob <- Would count as kill with current code
@@ -252,25 +236,20 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     -- if DamageValid[guid] is set, it can be used to decide if the kill was valid with 100% certainty
     if DamageValid[d_guid] ~= nil then
         pass = DamageValid[d_guid]
-        self:DebugMsg("pass set from DamageValid for d_guid = " .. d_guid .. " to " .. tostring(pass))
     else
         -- The one who dealt the very first bit of damage was probably the one who got the tag on the mob
         -- This should apply in most (if not all) situations and is probably a safe fallback when we couldn't
         -- retrieve tapped status from GUID->Unit
         pass = firstByPlayer or firstByGroup
-        self:DebugMsg("pass set from firstByPlayer or firstByGroup for d_guid = " .. d_guid .. " to " .. tostring(pass))
     end
 
     if not self.Global.COUNT_GROUP and pass and not lastByPlayer then
         pass = false -- Player or player's pet did not deal the killing blow and addon only tracks player kills
     end
 
-    self:DebugMsg("FINAL CHECK, pass = " .. tostring(pass))
-
     if not pass or d_id == nil or d_id == 0 then return end
     FirstDamage[d_guid] = nil
     DamageValid[d_guid] = nil
-    self:DebugMsg("Adding kill for " .. d_id .. " (" .. d_name .. ")")
     self:AddKill(d_id, d_name)
     if self.Timer:IsRunning() then
         self.Timer:SetData("Kills", self.Timer:GetData("Kills", true) + 1)
