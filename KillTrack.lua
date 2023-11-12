@@ -195,7 +195,7 @@ function KT.Events.ADDON_LOADED(self, ...)
 end
 
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
-    local _, event, _, s_guid, s_name, _, _, d_guid, d_name, _, _ = CombatLogGetCurrentEventInfo()
+    local _, event, _, s_guid, _, _, _, d_guid, d_name, _, _ = CombatLogGetCurrentEventInfo()
     if combat_log_damage_events[event] then
         if FirstDamage[d_guid] == nil then
             -- s_name is (probably) the player who first damaged this mob and probably has the tag
