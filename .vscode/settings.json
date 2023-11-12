@@ -1,3 +1,20 @@
 {
-    "Lua.runtime.version": "Lua 5.1"
+    "Lua.runtime.version": "Lua 5.1",
+    "Lua.diagnostics.globals": [
+        "StaticPopup_Show",
+        "TooltipDataProcessor",
+        "DEFAULT_CHAT_FRAME",
+        "RaidNotice_AddMessage",
+        "RaidBossEmoteFrame",
+        "ChatTypeInfo",
+        "RaidWarningFrame",
+        "SlashCmdList",
+        "StaticPopupDialogs",
+        "FauxScrollFrame_Update",
+        "FauxScrollFrame_OnVerticalScroll",
+        "FauxScrollFrame_GetOffset",
+        "InterfaceOptions_AddCategory",
+        "InterfaceOptionsFrame_OpenToCategory",
+        "GameMenuFrame"
+    ]
 }
