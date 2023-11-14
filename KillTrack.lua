@@ -222,8 +222,8 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
 
     -- Perform solo/group checks
     local d_id = KTT:GUIDToID(d_guid)
-    local firstDamage = FirstDamage[d_guid] or "<No One>"
-    local lastDamage = LastDamage[d_guid] or "<No One>"
+    local firstDamage = FirstDamage[d_guid]
+    local lastDamage = LastDamage[d_guid]
     local firstByPlayer = firstDamage == self.PlayerGUID or firstDamage == UnitGUID("pet")
     local firstByGroup = self:IsInGroup(firstDamage)
     local lastByPlayer = lastDamage == self.PlayerGUID or lastDamage == UnitGUID("pet")
@@ -333,9 +333,9 @@ function KT:ToggleDebug()
 end
 
 function KT:IsInGroup(unit)
+    if not unit then return false end
     if unit == self.PlayerName or unit == self.PlayerGUID then return true end
-    if IsGUIDInGroup(unit) then return true end
-    return false
+    return IsGUIDInGroup(unit)
 end
 
 function KT:SetThreshold(threshold)
