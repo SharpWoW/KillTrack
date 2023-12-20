@@ -333,7 +333,7 @@ function KT:ToggleDebug()
 end
 
 function KT:IsInGroup(unit)
-    if not unit then return false end
+    if not unit or unit == "" then return false end
     if unit == self.PlayerName or unit == self.PlayerGUID then return true end
     return IsGUIDInGroup(unit)
 end
