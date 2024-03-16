@@ -30,7 +30,7 @@ local GetServerTime = GetServerTime
 local NO_NAME = "<No Name>"
 
 KT.Name = NAME
-KT.Version = GetAddOnMetadata(NAME, "Version")
+KT.Version = C_AddOns.GetAddOnMetadata(NAME, "Version")
 KT.Events = {}
 KT.Global = {}
 KT.CharGlobal = {}
@@ -606,8 +606,8 @@ function KT:KillAlert(mob)
         Icon = "Interface\\Icons\\ABILITY_Deathwing_Bloodcorruption_Death",
         FrameStyle = "GuildAchievement"
     }
-    if IsAddOnLoaded("Glamour") then
-        if not _G.GlamourShowAlert then
+    if C_AddOns.IsAddOnLoaded("Glamour") then
+        if not _G["GlamourShowAlert"] then
             KT:Msg("ERROR: GlamourShowAlert == nil! Notify AddOn developer.")
             return
         end
