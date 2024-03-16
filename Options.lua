@@ -28,6 +28,7 @@ local Opt = KT.Options
 
 local panel = Opt.Panel
 
+---@diagnostic disable-next-line: inject-field
 panel.name = "KillTrack"
 panel:Hide()
 
@@ -45,9 +46,12 @@ local function checkbox(label, description, onclick)
         PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
         onclick(self, checked and true or false)
     end)
+    ---@diagnostic disable-next-line: inject-field
     check.label = _G[check:GetName() .. "Text"]
     check.label:SetText(label)
+    ---@diagnostic disable-next-line: inject-field
     check.tooltipText = label
+    ---@diagnostic disable-next-line: inject-field
     check.tooltipRequirement = description
     checkCounter = checkCounter + 1
     return check
@@ -56,6 +60,7 @@ end
 local function button(text, tooltip, onclick)
     local btn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     btn:SetText(text)
+    ---@diagnostic disable-next-line: inject-field
     btn.tooltipText = tooltip
     btn:SetScript("OnClick", function(self) onclick(self) end)
     btn:SetHeight(24)

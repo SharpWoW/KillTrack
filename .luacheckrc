@@ -1,5 +1,8 @@
 stds.wow = {
   globals = {
+    _G = {
+      other_fields = true
+    },
     SlashCmdList = {
       other_fields = true
     },
@@ -9,6 +12,7 @@ stds.wow = {
   },
   read_globals = {
     "BackdropTemplateMixin",
+    "C_AddOns",
     "ChatTypeInfo",
     "CombatLogGetCurrentEventInfo",
     "COMBATLOG_XPGAIN_EXHAUSTION1",

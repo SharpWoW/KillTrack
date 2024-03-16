@@ -14,6 +14,7 @@
         "FauxScrollFrame_OnVerticalScroll",
         "FauxScrollFrame_GetOffset",
         "InterfaceOptions_AddCategory",
+        "InterfaceOptionsFrame",
         "InterfaceOptionsFrame_OpenToCategory",
         "GameMenuFrame",
         "UIParent",
@@ -59,6 +60,21 @@
         "IsShiftKeyDown",
         "BackdropTemplateMixin",
         "date",
-        "setmetatable"
+        "setmetatable",
+        "COMBATLOG_XPGAIN_EXHAUSTION1",
+        "COMBATLOG_XPGAIN_EXHAUSTION1_GROUP",
+        "COMBATLOG_XPGAIN_EXHAUSTION1_RAID",
+        "COMBATLOG_XPGAIN_EXHAUSTION2",
+        "COMBATLOG_XPGAIN_EXHAUSTION2_GROUP",
+        "COMBATLOG_XPGAIN_EXHAUSTION2_RAID",
+        "COMBATLOG_XPGAIN_EXHAUSTION4",
+        "COMBATLOG_XPGAIN_EXHAUSTION4_GROUP",
+        "COMBATLOG_XPGAIN_EXHAUSTION4_RAID",
+        "COMBATLOG_XPGAIN_EXHAUSTION5",
+        "COMBATLOG_XPGAIN_EXHAUSTION5_GROUP",
+        "COMBATLOG_XPGAIN_EXHAUSTION5_RAID",
+        "COMBATLOG_XPGAIN_FIRSTPERSON",
+        "COMBATLOG_XPGAIN_FIRSTPERSON_GROUP",
+        "COMBATLOG_XPGAIN_FIRSTPERSON_RAID"
     ]
 }

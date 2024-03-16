@@ -21,6 +21,7 @@ local _, KT = ...
 
 KT.ExpTracker = {
     Strings = {
+        ---@diagnostic disable: undefined-field
         _G.COMBATLOG_XPGAIN_EXHAUSTION1,       -- %s dies, you gain %d experience. (%s exp %s bonus)
         _G.COMBATLOG_XPGAIN_EXHAUSTION1_GROUP, -- %s dies, you gain %d experience. (%s exp %s bonus, +%d group bonus)
         _G.COMBATLOG_XPGAIN_EXHAUSTION1_RAID,  -- %s dies, you gain %d experience. (%s exp %s bonus, -%d raid penalty)
@@ -36,6 +37,7 @@ KT.ExpTracker = {
         _G.COMBATLOG_XPGAIN_FIRSTPERSON,       -- %s dies, you gain %d experience.
         _G.COMBATLOG_XPGAIN_FIRSTPERSON_GROUP, -- %s dies, you gain %d experience. (+%d group bonus)
         _G.COMBATLOG_XPGAIN_FIRSTPERSON_RAID   -- %s dies, you gain %d experience. (-%d raid penalty)
+        ---@diagnostic enable: undefined-field
     }
 }
 

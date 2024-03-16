@@ -94,24 +94,28 @@ local function CreateRow(container, previous)
     row:SetPoint("RIGHT")
     row:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 0)
 
+    ---@diagnostic disable-next-line: inject-field
     row.idField = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     row.idField:SetHeight(ROW_HEIGHT)
     row.idField:SetWidth(ID_WIDTH - ROW_TEXT_PADDING * 2)
     row.idField:SetPoint("LEFT", row, "LEFT", ROW_TEXT_PADDING, 0)
     row.idField:SetJustifyH("RIGHT")
 
+    ---@diagnostic disable-next-line: inject-field
     row.nameField = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     row.nameField:SetHeight(ROW_HEIGHT)
     row.nameField:SetWidth(NAME_WIDTH - SCROLL_WIDTH - ROW_TEXT_PADDING * 3)
     row.nameField:SetPoint("LEFT", row.idField, "RIGHT", 2 * ROW_TEXT_PADDING, 0)
     row.nameField:SetJustifyH("LEFT")
 
+    ---@diagnostic disable-next-line: inject-field
     row.charKillField = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     row.charKillField:SetHeight(ROW_HEIGHT)
     row.charKillField:SetWidth(CHAR_WIDTH - ROW_TEXT_PADDING * 2)
     row.charKillField:SetPoint("LEFT", row.nameField, "RIGHT", 2 * ROW_TEXT_PADDING, 0)
     row.charKillField:SetJustifyH("RIGHT")
 
+    ---@diagnostic disable-next-line: inject-field
     row.globalKillField = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     row.globalKillField:SetHeight(ROW_HEIGHT)
     row.globalKillField:SetWidth(GLOBAL_WIDTH - ROW_TEXT_PADDING * 2)
@@ -196,6 +200,7 @@ function ML:Create()
 
     frame:SetBackdrop(bd)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.titleLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.titleLabel:SetWidth(250)
     frame.titleLabel:SetHeight(16)
@@ -206,10 +211,12 @@ function ML:Create()
     frame:SetScript("OnMouseUp", function(s) s:StopMovingOrSizing() end)
     frame:SetScript("OnShow", function() ML:UpdateMobs(Sort, LastFilter) ML:UpdateEntries(LastOffset) end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.closeButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
     frame.closeButton:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, -1)
     frame.closeButton:SetScript("OnClick", function() ML:Hide() end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.purgeButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     frame.purgeButton:SetHeight(24)
     frame.purgeButton:SetWidth(100)
@@ -219,6 +226,7 @@ function ML:Create()
         KT:ShowPurge()
     end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.resetButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     frame.resetButton:SetHeight(24)
     frame.resetButton:SetWidth(100)
@@ -228,6 +236,7 @@ function ML:Create()
         KT:ShowReset()
     end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.helpLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.helpLabel:SetWidth(380)
     frame.helpLabel:SetHeight(16)
@@ -237,6 +246,7 @@ function ML:Create()
     frame.helpLabel:SetText(
         "Click on an individual entry to delete it from the database. Use the search to filter database by name.")
 
+    ---@diagnostic disable-next-line: inject-field
     frame.searchBox = CreateFrame("EditBox", "KillTrackMobListSearchBox", frame, "SearchBoxTemplate")
     frame.searchBox:SetWidth(200)
     frame.searchBox:SetHeight(16)
@@ -255,6 +265,7 @@ function ML:Create()
         ML:UpdateEntries(LastOffset)
     end)
     frame.searchBox:SetScript("OnEnterPressed", function(s) s:ClearFocus() end)
+    ---@diagnostic disable-next-line: inject-field
     frame.searchBox.clearButton = _G[frame.searchBox:GetName() .. "ClearButton"]
     local sBoxOldFunc = frame.searchBox.clearButton:GetScript("OnHide")
     frame.searchBox.clearButton:SetScript("OnHide", function(s)
@@ -264,12 +275,14 @@ function ML:Create()
         ML:UpdateEntries(LastOffset)
     end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.searchTipLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.searchTipLabel:SetWidth(200)
     frame.searchTipLabel:SetHeight(16)
     frame.searchTipLabel:SetPoint("LEFT", frame.searchBox, "RIGHT", -22, 0)
     frame.searchTipLabel:SetText("(Supports Lua patterns)")
 
+    ---@diagnostic disable-next-line: inject-field
     frame.idHeader = CreateHeader(frame)
     frame.idHeader:SetPoint("TOPLEFT", frame, "TOPLEFT", HEADER_LEFT, HEADER_TOP)
     frame.idHeader:SetWidth(ID_WIDTH)
@@ -283,6 +296,7 @@ function ML:Create()
         ML:UpdateEntries(LastOffset)
     end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.nameHeader = CreateHeader(frame)
     frame.nameHeader:SetPoint("TOPLEFT", frame.idHeader, "TOPRIGHT", -2, 0)
     frame.nameHeader:SetWidth(NAME_WIDTH - SCROLL_WIDTH)
@@ -296,6 +310,7 @@ function ML:Create()
         ML:UpdateEntries(LastOffset)
     end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.charKillHeader = CreateHeader(frame)
     frame.charKillHeader:SetPoint("TOPLEFT", frame.nameHeader, "TOPRIGHT", -2, 0)
     frame.charKillHeader:SetWidth(CHAR_WIDTH)
@@ -309,6 +324,7 @@ function ML:Create()
         ML:UpdateEntries(LastOffset)
     end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.globalKillHeader = CreateHeader(frame)
     frame.globalKillHeader:SetPoint("TOPLEFT", frame.charKillHeader, "TOPRIGHT", -2, 0)
     frame.globalKillHeader:SetWidth(GLOBAL_WIDTH + HEADER_LEFT)
@@ -322,6 +338,7 @@ function ML:Create()
         ML:UpdateEntries(LastOffset)
     end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.rows = CreateFrame("Frame", nil, frame)
     frame.rows:SetPoint("LEFT")
     frame.rows:SetPoint("RIGHT", frame, "RIGHT", -SCROLL_WIDTH, 0)
@@ -340,6 +357,7 @@ function ML:Create()
         previous = frame.rows[key]
     end
 
+    ---@diagnostic disable-next-line: inject-field
     frame.rows.scroller = CreateFrame(
         "ScrollFrame",
         "KillTrackMobListScrollFrame",
@@ -364,6 +382,7 @@ function ML:Create()
 
     self:UpdateMobs(Sort)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.statusLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.statusLabel:SetWidth(420)
     frame.statusLabel:SetHeight(16)

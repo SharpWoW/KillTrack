@@ -69,6 +69,7 @@ local function SetupFrame()
         G.POSITION.Y = y
     end)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.killLabel = frame:CreateFontString(nil, "OVERLAY", nil)
     frame.killLabel:SetFont("Fonts\\FRIZQT__.TTF", 16, nil)
     frame.killLabel:SetWidth(100)
@@ -76,6 +77,7 @@ local function SetupFrame()
     frame.killLabel:SetPoint("LEFT", frame, "LEFT", 2, 0)
     frame.killLabel:SetText("Kills so far:")
 
+    ---@diagnostic disable-next-line: inject-field
     frame.killCount = frame:CreateFontString(nil, "OVERLAY", nil)
     frame.killCount:SetFont("Fonts\\FRIZQT__.TTF", 16, nil)
     frame.killCount:SetWidth(100)
@@ -84,6 +86,7 @@ local function SetupFrame()
     frame.killCount:SetJustifyH("RIGHT")
     frame.killCount:SetText("0")
 
+    ---@diagnostic disable-next-line: inject-field
     frame.closeButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     frame.closeButton:SetWidth(60)
     frame.closeButton:SetHeight(24)
