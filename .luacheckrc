@@ -57,6 +57,7 @@ stds.wow = {
     "RaidNotice_AddMessage",
     "RaidWarningFrame",
     "SendChatMessage",
+    "Settings",
     "SOUNDKIT",
     "StaticPopup_Show",
     "time",

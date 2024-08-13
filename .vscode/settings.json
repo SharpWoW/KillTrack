@@ -51,6 +51,7 @@
         "PlaySound",
         "string",
         "math",
+        "Settings",
         "SOUNDKIT",
         "IsInRaid",
         "IsInGroup",

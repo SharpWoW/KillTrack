@@ -32,6 +32,9 @@ local panel = Opt.Panel
 panel.name = "KillTrack"
 panel:Hide()
 
+local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
+Opt.Category = category
+
 -- Dirty hack to give a name to option checkboxes
 local checkCounter = 0
 
@@ -73,8 +76,7 @@ local function HideBlizzOptions()
 end
 
 function Opt:Open()
-    InterfaceOptionsFrame_OpenToCategory(panel)
-    InterfaceOptionsFrame_OpenToCategory(panel)
+    Settings.OpenToCategory(self.Category.ID)
 end
 
 function Opt:Show()
@@ -259,4 +261,4 @@ end
 
 panel:SetScript("OnShow", function(self) Opt.Show(self) end)
 
-InterfaceOptions_AddCategory(panel)
+Settings.RegisterAddOnCategory(category)
