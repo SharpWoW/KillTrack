@@ -1,5 +1,5 @@
-## Interface: 100205
-## Interface-Vanilla: 11501
+## Interface: 110000, 110002
+## Interface-Vanilla: 11503
 ## Interface-Cata: 40400
 ## Version: @project-version@
 ## Title: KillTrack
