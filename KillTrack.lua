@@ -22,6 +22,7 @@ local NAME, KT = ...
 _G[NAME] = KT
 
 -- Upvalue some functions used in CLEU
+local IsGUIDInGroup = IsGUIDInGroup
 local UnitGUID = UnitGUID
 local UnitIsTapDenied = UnitIsTapDenied
 local UnitTokenFromGUID = UnitTokenFromGUID
