@@ -55,6 +55,7 @@
         "math",
         "Settings",
         "SOUNDKIT",
+        "strsplit",
         "IsInRaid",
         "IsInGroup",
         "UnitXPMax",

@@ -62,6 +62,9 @@ local ET
 
 local KTT = KT.Tools
 
+-- Upvalue as it's used in CLEU
+local GUIDToID = KTT.GUIDToID
+
 local FirstDamage = {} -- Tracks first damage to a mob registered by CLEU
 local LastDamage = {} -- Tracks whoever did the most recent damage to a mob
 local DamageValid = {} -- Determines if mob is tapped by player/group
@@ -222,7 +225,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     if event ~= "UNIT_DIED" then return end
 
     -- Perform solo/group checks
-    local d_id = KTT:GUIDToID(d_guid)
+    local d_id = GUIDToID(d_guid)
     local firstDamage = FirstDamage[d_guid]
     local lastDamage = LastDamage[d_guid]
     local firstByPlayer = firstDamage == self.PlayerGUID or firstDamage == UnitGUID("pet")
@@ -282,7 +285,7 @@ local function tooltip_enhancer(self)
     local _, unit = self:GetUnit()
     if not unit then return end
     if UnitIsPlayer(unit) then return end
-    local id = KTT:GUIDToID(UnitGUID(unit))
+    local id = KTT.GUIDToID(UnitGUID(unit))
     if not id then return end
     if UnitCanAttack("player", unit) then
         local mob, charMob = KT:InitMob(id, UnitName(unit))

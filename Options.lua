@@ -140,7 +140,7 @@ function Opt:Show()
     local showTarget = button("Target", "Show information about the currently selected target",
         function()
             if not UnitExists("target") or UnitIsPlayer("target") then return end
-            local id = KTT:GUIDToID(UnitGUID("target"))
+            local id = KTT.GUIDToID(UnitGUID("target"))
             KT:PrintKills(id)
         end)
     showTarget:SetWidth(150)

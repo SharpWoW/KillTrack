@@ -89,7 +89,7 @@ end)
 
 C:Register({"target", "t", "tar"}, function()
     if not UnitExists("target") or UnitIsPlayer("target") then return end
-    local id = KTT:GUIDToID(UnitGUID("target"))
+    local id = KTT.GUIDToID(UnitGUID("target"))
     KT:PrintKills(id)
 end)
 

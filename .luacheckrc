@@ -60,6 +60,7 @@ stds.wow = {
     "Settings",
     "SOUNDKIT",
     "StaticPopup_Show",
+    "strsplit",
     "time",
     "TooltipDataProcessor",
     "UIParent",
