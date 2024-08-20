@@ -1,6 +1,7 @@
 {
     "Lua.runtime.version": "Lua 5.1",
     "Lua.diagnostics.globals": [
+        "C_AddOns",
         "StaticPopup_Show",
         "TooltipDataProcessor",
         "DEFAULT_CHAT_FRAME",
