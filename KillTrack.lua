@@ -109,13 +109,6 @@ if KT.Version == "@" .. "project-version" .. "@" then
     KT.Debug = true
 end
 
-local function FindUnitByGUID(guid)
-    for i = 1, #Units do
-        if UnitGUID(Units[i]) == guid then return Units[i] end
-    end
-    return nil
-end
-
 function KT:OnEvent(_, event, ...)
     if self.Events[event] then
         self.Events[event](self, ...)
