@@ -24,6 +24,7 @@ _G[NAME] = KT
 -- Upvalue some functions used in CLEU
 local UnitGUID = UnitGUID
 local UnitIsTapDenied = UnitIsTapDenied
+local UnitTokenFromGUID = UnitTokenFromGUID
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local GetServerTime = GetServerTime
 
@@ -208,7 +209,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
             -- if DamageValid returns true for a GUID, we can tell with 100% certainty that it's valid
             -- But this relies on one of the valid unit names currently being the damaged mob
 
-            local d_unit = FindUnitByGUID(d_guid)
+            local d_unit = UnitTokenFromGUID(d_guid)
 
             if not d_unit then return end
 

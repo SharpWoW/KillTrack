@@ -39,6 +39,7 @@
         "time",
         "UnitIsPlayer",
         "UnitCanAttack",
+        "UnitTokenFromGUID",
         "error",
         "tonumber",
         "ipairs",

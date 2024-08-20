@@ -71,6 +71,7 @@ stds.wow = {
     "UnitIsPlayer",
     "UnitIsTapDenied",
     "UnitName",
+    "UnitTokenFromGUID",
     "UnitXP",
     "UnitXPMax",
     "wipe",
