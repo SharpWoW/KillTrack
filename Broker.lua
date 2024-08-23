@@ -17,17 +17,19 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.Broker = {
+---@class KillTrackBroker
+local KTB = {
     Text = {
         Short = "KPM: %.2f",
         Long = "Kills Per Minute: %.2f"
     }
 }
 
+KT.Broker = KTB
 local KTT = KT.Tools
-local KTB = KT.Broker
 
 local UPDATE = 1
 local t = 0

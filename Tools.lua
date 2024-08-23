@@ -17,11 +17,13 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.Tools = {}
+---@class KillTrackTools
+local KTT = {}
 
-local KTT = KT.Tools
+KT.Tools = KTT
 
 ------------------
 -- NUMBER TOOLS --

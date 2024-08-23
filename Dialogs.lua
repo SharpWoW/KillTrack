@@ -17,7 +17,8 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
 StaticPopupDialogs.KILLTRACK_FINISH = {
     text = "%s entries removed.",

@@ -17,14 +17,17 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
+
 local KTT = KT.Tools
 
-KT.Options = {
+---@class KillTrackOptions
+local Opt = {
     Panel = CreateFrame("Frame")
 }
 
-local Opt = KT.Options
+KT.Options = Opt
 
 local panel = Opt.Panel
 

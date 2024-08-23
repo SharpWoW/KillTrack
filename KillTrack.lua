@@ -17,7 +17,10 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local NAME, KT = ...
+local NAME = ...
+
+---@class KillTrack
+local KT = select(2, ...)
 
 _G[NAME] = KT
 

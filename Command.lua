@@ -17,9 +17,11 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.Command = {
+---@class KillTrackCommand
+local C = {
     Slash = {
         "killtrack",
         "kt"
@@ -27,7 +29,7 @@ KT.Command = {
     Commands = {}
 }
 
-local C = KT.Command
+KT.Command = C
 local KTT = KT.Tools
 
 -- Argument #1 (command) can be either string or a table.

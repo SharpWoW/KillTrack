@@ -17,9 +17,11 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.Timer = {
+---@class KillTrackTimer
+local T = {
     Time = {
         Start = 0,
         Stop = 0
@@ -32,7 +34,7 @@ KT.Timer = {
     }
 }
 
-local T = KT.Timer
+KT.Timer = T
 
 local KTT = KT.Tools
 

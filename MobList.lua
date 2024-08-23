@@ -19,11 +19,13 @@
 
 -- Beware of some possibly messy code in this file
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.MobList = {}
+---@class KillTrackMobList
+local ML = {}
 
-local ML = KT.MobList
+KT.MobList = ML
 local KTT = KT.Tools
 
 local Sort = KT.Sort.Desc

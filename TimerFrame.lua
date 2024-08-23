@@ -17,13 +17,16 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.TimerFrame = {
+---@class KillTrackTimerFrame
+local TF = {
     Running = false
 }
 
-local TF = KT.TimerFrame
+KT.TimerFrame = TF
+
 local T = KT.Timer
 
 local function Enabled(object, enabled)
