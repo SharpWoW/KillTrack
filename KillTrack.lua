@@ -17,9 +17,12 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+---@type string
 local NAME = ...
 
 ---@class KillTrack
+---@field PlayerName string
+---@field PlayerGUID string?
 local KT = select(2, ...)
 
 _G[NAME] = KT
@@ -62,6 +65,7 @@ KT.Defaults = {
     DateTimeFormat = "%Y-%m-%d %H:%M:%S"
 }
 
+---@type KillTrackExpTracker
 local ET
 
 local KTT = KT.Tools
@@ -69,8 +73,13 @@ local KTT = KT.Tools
 -- Upvalue as it's used in CLEU
 local GUIDToID = KTT.GUIDToID
 
+---@type { [string]: string? }
 local FirstDamage = {} -- Tracks first damage to a mob registered by CLEU
+
+---@type { [string]: string? }
 local LastDamage = {} -- Tracks whoever did the most recent damage to a mob
+
+---@type { [string]: boolean? }
 local DamageValid = {} -- Determines if mob is tapped by player/group
 
 local Units = {
@@ -163,8 +172,9 @@ function KT:OnEvent(_, event, ...)
     end
 end
 
-function KT.Events.ADDON_LOADED(self, ...)
-    local name = (select(1, ...))
+---@param self KillTrack
+---@param name string
+function KT.Events.ADDON_LOADED(self, name)
     if name ~= NAME then return end
     ET = KT.ExpTracker
     if type(_G["KILLTRACK"]) ~= "table" then
@@ -240,6 +250,7 @@ function KT.Events.ADDON_LOADED(self, ...)
     self.Broker:OnLoad()
 end
 
+---@param self KillTrack
 function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     local _, event, _, s_guid, _, _, _, d_guid, d_name, _, _ = CombatLogGetCurrentEventInfo()
     if combat_log_damage_events[event] then
