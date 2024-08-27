@@ -100,7 +100,7 @@ end
 function I:Show()
     if not frame then SetupFrame() end
     self.Kills = 0
-    frame.killCount:SetText(self.Kills)
+    frame.killCount:SetText(tostring(self.Kills))
     frame:Show()
     self.Active = true
 end
@@ -108,7 +108,7 @@ end
 function I:Hide()
     frame:Hide()
     self.Kills = 0
-    frame.killCount:SetText(self.Kills)
+    frame.killCount:SetText(tostring(self.Kills))
     self.Active = false
 end
 
