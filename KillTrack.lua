@@ -82,16 +82,6 @@ local LastDamage = {} -- Tracks whoever did the most recent damage to a mob
 ---@type { [string]: boolean? }
 local DamageValid = {} -- Determines if mob is tapped by player/group
 
-local Units = {
-    "target",
-    "targetpet",
-    "focus",
-    "focuspet",
-    "pet",
-    "mouseover",
-    "mouseoverpet",
-}
-
 local combat_log_damage_events = {}
 do
     local prefixes = { "SWING", "RANGE", "SPELL", "SPELL_PERIODIC", "SPELL_BUILDING" }
@@ -101,19 +91,6 @@ do
             combat_log_damage_events[prefix .. "_" .. suffix] = true
         end
     end
-end
-
-for i = 1, 40 do
-    if i <= 4 then
-        Units[#Units + 1] = "party" .. i
-        Units[#Units + 1] = "partypet" .. i
-    end
-    Units[#Units + 1] = "raid" .. i
-    Units[#Units + 1] = "raidpet" .. i
-end
-
-for i = 1, #Units * 2 do
-    Units[#Units + 1] = Units[i] .. "target"
 end
 
 if KT.Version == "@" .. "project-version" .. "@" then
