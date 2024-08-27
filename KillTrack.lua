@@ -270,6 +270,10 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     local d_id = GUIDToID(d_guid)
     local firstDamage = FirstDamage[d_guid]
     local lastDamage = LastDamage[d_guid]
+    local damageValid = DamageValid[d_guid]
+    FirstDamage[d_guid] = nil
+    LastDamage[d_guid] = nil
+    DamageValid[d_guid] = nil
     local firstByPlayer = firstDamage == self.PlayerGUID or firstDamage == UnitGUID("pet")
     local firstByGroup = self:IsInGroup(firstDamage)
     local lastByPlayer = lastDamage == self.PlayerGUID or lastDamage == UnitGUID("pet")
@@ -280,8 +284,8 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     -- Scenario: You deal the killing blow to an already tapped mob <- Would count as kill with current code
 
     -- if DamageValid[guid] is set, it can be used to decide if the kill was valid with 100% certainty
-    if DamageValid[d_guid] ~= nil then
-        pass = DamageValid[d_guid]
+    if damageValid ~= nil then
+        pass = damageValid
     else
         -- The one who dealt the very first bit of damage was probably the one who got the tag on the mob
         -- This should apply in most (if not all) situations and is probably a safe fallback when we couldn't
@@ -294,8 +298,6 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     end
 
     if not pass or d_id == nil or d_id == 0 then return end
-    FirstDamage[d_guid] = nil
-    DamageValid[d_guid] = nil
     self:AddKill(d_id, d_name)
     if self.Timer:IsRunning() then
         self.Timer:SetData("Kills", self.Timer:GetData("Kills", true) + 1)
