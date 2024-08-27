@@ -26,6 +26,7 @@ local C = {
         "killtrack",
         "kt"
     },
+    ---@type { [string]: fun(args: string[]) }
     Commands = {}
 }
 
@@ -33,6 +34,8 @@ KT.Command = C
 local KTT = KT.Tools
 
 -- Argument #1 (command) can be either string or a table.
+---@param command string|string[]
+---@param func fun(args: string[])
 function C:Register(command, func)
     if type(command) == "string" then
         command = {command}
@@ -45,6 +48,8 @@ function C:Register(command, func)
     end
 end
 
+---@param command string
+---@return boolean
 function C:HasCommand(command)
     for k,_ in pairs(self.Commands) do
         if k == command then return true end
@@ -52,11 +57,15 @@ function C:HasCommand(command)
     return false
 end
 
+---@param command string
+---@return fun(args: string[])
 function C:GetCommand(command)
     local cmd = self.Commands[command]
     if cmd then return cmd else return self.Commands["__DEFAULT__"] end
 end
 
+---@param command string
+---@param args string[]
 function C:HandleCommand(command, args)
     local cmd = self:GetCommand(command)
     if cmd then
@@ -114,10 +123,10 @@ C:Register({"printnew", "pn"}, function()
 end)
 
 C:Register({"set", "edit"}, function(args)
-    local id = tonumber(args[1])
+    local id = tonumber(args[1]) --[[@as integer]]
     local name = args[2]
-    local global = tonumber(args[3])
-    local char = tonumber(args[4])
+    local global = tonumber(args[3]) --[[@as integer]]
+    local char = tonumber(args[4]) --[[@as integer]]
 
     local err
 
@@ -168,8 +177,9 @@ C:Register({"delete", "del", "remove", "rem"}, function(args)
 end)
 
 C:Register({"purge"}, function(args)
+    ---@type integer?
     local threshold
-    if #args >= 1 then threshold = tonumber(args[1]) end
+    if #args >= 1 then threshold = tonumber(args[1]) --[[@as integer]] end
     KT:ShowPurge(threshold)
 end)
 
@@ -220,7 +230,7 @@ C:Register({"immediate", "imm", "i"}, function(args)
     if #args < 1 then
         KT.Immediate:Show()
     elseif args[1]:match("^t") then
-        local threshold = tonumber(args[2])
+        local threshold = tonumber(args[2]) --[[@as integer]]
         if #args < 2 then
             KT:Msg("Usage: immediate threshold <threshold>")
             KT:Msg("E.g: /kt immediate threshold 50")

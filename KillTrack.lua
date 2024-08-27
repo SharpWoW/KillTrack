@@ -25,6 +25,18 @@ local NAME = ...
 ---@field PlayerGUID string?
 local KT = select(2, ...)
 
+---@class KillTrackMobData
+---@field Kills integer
+---@field Name string
+---@field LastKillAt integer?
+---@field AchievCount integer
+---@field Exp integer?
+
+---@class KillTrackCharMobData
+---@field Kills integer
+---@field Name string
+---@field LastKillAt integer?
+
 _G[NAME] = KT
 
 -- Upvalue some functions used in CLEU
@@ -40,9 +52,39 @@ local NO_NAME = "<No Name>"
 KT.Name = NAME
 KT.Version = C_AddOns.GetAddOnMetadata(NAME, "Version")
 KT.Events = {}
+
+---@class KillTrackImmediatePosition
+---@field POINT string?
+---@field RELATIVE string?
+---@field X number?
+---@field Y number?
+
+---@class KillTrackGlobal
+---@field LOAD_MESSAGE boolean
+---@field PRINTKILLS boolean
+---@field PRINTNEW boolean
+---@field ACHIEV_THRESHOLD integer
+---@field COUNT_GROUP boolean
+---@field SHOW_EXP boolean
+---@field MOBS { [integer]: KillTrackMobData }
+---@field IMMEDIATE { POSITION: KillTrackImmediatePosition, THRESHOLD: integer, FILTER: string? }
+---@field BROKER { SHORT_TEXT: boolean, MINIMAP: { hide: boolean } }
+---@field DISABLE_DUNGEONS boolean
+---@field DISABLE_RAIDS boolean
+---@field TOOLTIP boolean
+---@field DATETIME_FORMAT string
 KT.Global = {}
+
+---@class KillTrackCharGlobal
+---@field MOBS { [integer]: KillTrackCharMobData }
 KT.CharGlobal = {}
+
+---@class KillTrackTemp
+---@field Threshold integer?
+---@field DeleteId integer?
 KT.Temp = {}
+
+---@enum KillTrackMobSortMode
 KT.Sort = {
     Desc = 0,
     Asc = 1,
@@ -55,6 +97,7 @@ KT.Sort = {
 }
 KT.Session = {
     Count = 0,
+    ---@type { [string]: integer? }
     Kills = {}
 }
 KT.Messages = {
@@ -143,6 +186,9 @@ if not UnitTokenFromGUID then
     end
 end
 
+---@param _ Frame
+---@param event string
+---@param ... any
 function KT:OnEvent(_, event, ...)
     if self.Events[event] then
         self.Events[event](self, ...)
@@ -292,10 +338,14 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     end
 end
 
-function KT.Events.CHAT_MSG_COMBAT_XP_GAIN(self, message)
+---@param _ KillTrack
+---@param message string
+function KT.Events.CHAT_MSG_COMBAT_XP_GAIN(_, message)
     ET:CheckMessage(message)
 end
 
+---@param self KillTrack
+---@param size integer
 function KT.Events.ENCOUNTER_START(self, _, _, _, size)
     if (self.Global.DISABLE_DUNGEONS and size == 5) or (self.Global.DISABLE_RAIDS and size > 5) then
         self.Frame:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -304,6 +354,8 @@ function KT.Events.ENCOUNTER_START(self, _, _, _, size)
     end
 end
 
+---@param self KillTrack
+---@param size integer
 function KT.Events.ENCOUNTER_END(self, _, _, _, size)
     if (self.Global.DISABLE_DUNGEONS and size == 5) or (self.Global.DISABLE_RAIDS and size > 5) then
         self.Frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -312,6 +364,7 @@ function KT.Events.ENCOUNTER_END(self, _, _, _, size)
     end
 end
 
+---@param self GameTooltip
 local function tooltip_enhancer(self)
     if not KT.Global.TOOLTIP then return end
     local _, unit = self:GetUnit()
@@ -368,12 +421,15 @@ function KT:ToggleDebug()
     end
 end
 
+---@param unit string?
+---@return boolean
 function KT:IsInGroup(unit)
     if not unit or unit == "" then return false end
     if unit == self.PlayerName or unit == self.PlayerGUID then return true end
     return IsGUIDInGroup(unit)
 end
 
+---@param threshold integer
 function KT:SetThreshold(threshold)
     if type(threshold) ~= "number" then
         error("KillTrack.SetThreshold: Argument #1 (threshold) must be of type 'number'")
@@ -387,6 +443,7 @@ function KT:SetThreshold(threshold)
     end
 end
 
+---@param threshold integer
 function KT:SetImmediateThreshold(threshold)
     if type(threshold) ~= "number" then
         error("KillTrack.SetImmediateThreshold: Argument #1 (threshold) must be of type 'number'")
@@ -399,6 +456,7 @@ function KT:SetImmediateThreshold(threshold)
     end
 end
 
+---@param filter string
 function KT:SetImmediateFilter(filter)
     if type(filter) ~= "string" then
         error("KillTrack.SetImmediateFilter: Argument #1 (filter) must be of type 'string'")
@@ -421,6 +479,10 @@ function KT:ToggleCountMode()
     end
 end
 
+---@param id integer
+---@param name string?
+---@return KillTrackMobData
+---@return KillTrackCharMobData
 function KT:InitMob(id, name)
     name = name or NO_NAME
 
@@ -445,6 +507,8 @@ function KT:InitMob(id, name)
     return self.Global.MOBS[id], self.CharGlobal.MOBS[id]
 end
 
+---@param id integer
+---@param name string?
 function KT:AddKill(id, name)
     name = name or NO_NAME
     local current_time = GetServerTime()
@@ -491,6 +555,10 @@ function KT:AddKill(id, name)
     end
 end
 
+---@param id integer
+---@param name string?
+---@param globalCount integer
+---@param charCount integer
 function KT:SetKills(id, name, globalCount, charCount)
     if type(id) ~= "number" then
         error("'id' argument must be a number")
@@ -513,6 +581,7 @@ function KT:SetKills(id, name, globalCount, charCount)
     self:Msg(("Updated %q to %d global and %d character kills"):format(name, globalCount, charCount))
 end
 
+---@param name string
 function KT:AddSessionKill(name)
     if self.Session.Kills[name] then
         self.Session.Kills[name] = self.Session.Kills[name] + 1
@@ -522,12 +591,16 @@ function KT:AddSessionKill(name)
     self.Session.Count = self.Session.Count + 1
 end
 
+---@param name string
+---@param exp integer|string
 function KT:SetExp(name, exp)
     for _, mob in pairs(self.Global.MOBS) do
         if mob.Name == name then mob.Exp = tonumber(exp) end
     end
 end
 
+---@param max integer|string?
+---@return { Name: string, Kills: integer }[]
 function KT:GetSortedSessionKills(max)
     max = tonumber(max) or 3
     local t = {}
@@ -552,6 +625,9 @@ function KT:ResetSession()
     self.Session.Start = time()
 end
 
+---@param id integer
+---@return integer globalKills
+---@return integer charKills
 function KT:GetKills(id)
     local gKills, cKills = 0, 0
     local mob = self.Global.MOBS[id]
@@ -565,6 +641,7 @@ function KT:GetKills(id)
     return gKills, cKills
 end
 
+---@return integer
 function KT:GetTotalKills()
     local count = 0
     for _, mob in pairs(self.Global.MOBS) do
@@ -573,6 +650,10 @@ function KT:GetTotalKills()
     return count
 end
 
+---@return integer killsPerSecond
+---@return integer killsPerMinute
+---@return integer killsPerHour
+---@return integer killsThisSession
 function KT:GetSessionStats()
     if not self.Session.Start then return 0, 0, 0 end
     local now = time()
@@ -583,6 +664,7 @@ function KT:GetSessionStats()
     return kps, kpm, kph, session
 end
 
+---@param identifier string|integer?
 function KT:PrintKills(identifier)
     local found = false
     local name = NO_NAME
@@ -616,6 +698,7 @@ function KT:PrintKills(identifier)
     end
 end
 
+---@param target string
 function KT:Announce(target)
     if target == "GROUP" then
         target = ((IsInRaid() and "RAID") or (IsInGroup() and "PARTY")) or "SAY"
@@ -625,15 +708,18 @@ function KT:Announce(target)
     SendChatMessage(msg, target)
 end
 
+---@param msg string
 function KT:Msg(msg)
     DEFAULT_CHAT_FRAME:AddMessage("\124cff00FF00[KillTrack]\124r " .. msg)
 end
 
+---@param msg string
 function KT:DebugMsg(msg)
     if not self.Debug then return end
     self:Msg("[DEBUG] " .. msg)
 end
 
+---@param mob KillTrackMobData
 function KT:KillAlert(mob)
     local data = {
         Text = ("%d kills on %s!"):format(mob.Kills, mob.Name),
@@ -655,6 +741,9 @@ function KT:KillAlert(mob)
     self:Msg(data.Text)
 end
 
+---@param id integer|string
+---@return KillTrackMobData|false
+---@return KillTrackCharMobData|nil
 function KT:GetMob(id)
     for k,v in pairs(self.Global.MOBS) do
         if type(v) == "table" and (tostring(k) == tostring(id) or v.Name == id) then
@@ -664,6 +753,10 @@ function KT:GetMob(id)
     return false, nil
 end
 
+---@param mode KillTrackMobSortMode|integer?
+---@param filter string?
+---@param caseSensitive boolean|nil
+---@return { Id: integer, Name: string, gKills: integer, cKills: integer }[]
 function KT:GetSortedMobTable(mode, filter, caseSensitive)
     if not tonumber(mode) then mode = self.Sort.Desc end
     if mode < 0 or mode > 7 then mode = self.Sort.Desc end
@@ -710,8 +803,10 @@ function KT:GetSortedMobTable(mode, filter, caseSensitive)
     return t
 end
 
+---@param id integer|string
+---@param charOnly boolean?
 function KT:Delete(id, charOnly)
-    id = tonumber(id)
+    id = tonumber(id) --[[@as integer]]
     if not id then error(("Expected 'id' param to be number, got %s."):format(type(id))) end
     local found = false
     local name
@@ -731,6 +826,7 @@ function KT:Delete(id, charOnly)
     end
 end
 
+---@param threshold integer
 function KT:Purge(threshold)
     local count = 0
     for k,v in pairs(self.Global.MOBS) do

@@ -55,6 +55,7 @@ local function Initialize()
     initialized = true
 end
 
+---@param message string
 function ET:CheckMessage(message)
     if not initialized then Initialize() end
     local name, exp

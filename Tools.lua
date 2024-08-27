@@ -29,6 +29,8 @@ KT.Tools = KTT
 -- NUMBER TOOLS --
 ------------------
 
+---@param seconds number
+---@return string
 function KTT:FormatSeconds(seconds)
     local hours = floor(seconds / 3600)
     local minutes = floor(seconds / 60) - hours * 60
@@ -40,10 +42,14 @@ end
 -- STRING TOOLS --
 ------------------
 
+---@param s string
+---@return string
 function KTT:Trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
+---@param s string
+---@return string[]
 function KTT:Split(s)
     local r = {}
     local tokpat = "%S+"
@@ -76,6 +82,9 @@ end
 -- TABLE TOOLS --
 -----------------
 
+---@param tbl table
+---@param val any
+---@return boolean
 function KTT:InTable(tbl, val)
     for _,v in pairs(tbl) do
         if v == val then return true end
@@ -83,6 +92,9 @@ function KTT:InTable(tbl, val)
     return false
 end
 
+---@param tbl table
+---@param cache table?
+---@return table
 function KTT:TableCopy(tbl, cache)
     if type(tbl) ~= "table" then return tbl end
     cache = cache or {}
@@ -95,6 +107,8 @@ function KTT:TableCopy(tbl, cache)
     return copy
 end
 
+---@param table table
+---@return integer
 function KTT:TableLength(table)
     local count = 0
     for _, _ in pairs(table) do
@@ -107,6 +121,9 @@ end
 -- DATETIME TOOLS --
 --------------------
 
+---@param timestamp number?
+---@param format string?
+---@return string|osdate
 function KTT:FormatDateTime(timestamp, format)
     timestamp = timestamp or GetServerTime()
     format = format or KT.Global.DATETIME_FORMAT or KT.Defaults.DateTimeFormat
@@ -118,6 +135,9 @@ end
 -----------------
 
 local ssplit = strsplit
+
+---@param guid string?
+---@return integer?
 function KTT.GUIDToID(guid)
     if not guid then return nil end
     -- local id = guid:match("^%w+%-0%-%d+%-%d+%-%d+%-(%d+)%-[A-Z%d]+$")
