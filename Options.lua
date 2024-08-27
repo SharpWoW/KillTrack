@@ -98,7 +98,7 @@ function Opt.Show(self)
 
     local printKills = checkbox("Print kill updates to chat",
         "With this enabled, every kill you make is going to be announced locally in the chatbox",
-        function(_, checked) KT.Global.PRINT = checked end)
+        function(_, checked) KT.Global.PRINTKILLS = checked end)
     printKills:SetPoint("TOPLEFT", title, "BOTTOMLEFT", -2, -16)
 
     local tooltipControl = checkbox("Show mob data in tooltip",
@@ -255,7 +255,7 @@ function Opt.Show(self)
     datetimeFormatReset:SetPoint("LEFT", datetimeFormat, "RIGHT", 5, 0)
 
     local function init()
-        printKills:SetChecked(KT.Global.PRINT)
+        printKills:SetChecked(KT.Global.PRINTKILLS)
         tooltipControl:SetChecked(KT.Global.TOOLTIP)
         printNew:SetChecked(KT.Global.PRINTNEW)
         countGroup:SetChecked(KT.Global.COUNT_GROUP)
