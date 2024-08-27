@@ -104,7 +104,7 @@ end
 ---@param data { [any]: any }?
 ---@return boolean
 function T:Start(seconds, minutes, hours, callback, data)
-    if self.Running then return end
+    if self.Running then return false end
     self.Running = true
     self:Reset()
     seconds = tonumber(seconds) or 0

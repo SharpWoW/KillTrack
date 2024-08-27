@@ -655,7 +655,7 @@ end
 ---@return integer killsPerHour
 ---@return integer killsThisSession
 function KT:GetSessionStats()
-    if not self.Session.Start then return 0, 0, 0 end
+    if not self.Session.Start then return 0, 0, 0, 0 end
     local now = time()
     local session = now - self.Session.Start
     local kps = session == 0 and 0 or self.Session.Count / session
