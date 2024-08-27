@@ -344,27 +344,27 @@ end
 function KT:ToggleLoadMessage()
     self.Global.LOAD_MESSAGE = not self.Global.LOAD_MESSAGE
     if self.Global.LOAD_MESSAGE then
-        KT:Msg("Now showing message on AddOn load")
+        self:Msg("Now showing message on AddOn load")
     else
-        KT:Msg("No longer showing message on AddOn load")
+        self:Msg("No longer showing message on AddOn load")
     end
 end
 
 function KT:ToggleExp()
     self.Global.SHOW_EXP = not self.Global.SHOW_EXP
     if self.Global.SHOW_EXP then
-        KT:Msg("Now showing EXP on tooltips!")
+        self:Msg("Now showing EXP on tooltips!")
     else
-        KT:Msg("No longer showing EXP on tooltips.")
+        self:Msg("No longer showing EXP on tooltips.")
     end
 end
 
 function KT:ToggleDebug()
     self.Debug = not self.Debug
     if self.Debug then
-        KT:Msg("Debug enabled!")
+        self:Msg("Debug enabled!")
     else
-        KT:Msg("Debug disabled!")
+        self:Msg("Debug disabled!")
     end
 end
 
@@ -381,9 +381,9 @@ function KT:SetThreshold(threshold)
     self.Global.ACHIEV_THRESHOLD = threshold
     if threshold > 0 then
         self:ResetAchievCount()
-        KT:Msg(("New kill notice (achievement) threshold set to %d."):format(threshold))
+        self:Msg(("New kill notice (achievement) threshold set to %d."):format(threshold))
     else
-        KT:Msg("Kill notices have been disabled (set threshold to a value greater than 0 to re-enable).")
+        self:Msg("Kill notices have been disabled (set threshold to a value greater than 0 to re-enable).")
     end
 end
 
@@ -393,9 +393,9 @@ function KT:SetImmediateThreshold(threshold)
     end
     self.Global.IMMEDIATE.THRESHOLD = threshold
     if threshold > 0 then
-        KT:Msg(("New immediate threshold set to %d."):format(threshold))
+        self:Msg(("New immediate threshold set to %d."):format(threshold))
     else
-        KT:Msg("Immediate threshold disabled.")
+        self:Msg("Immediate threshold disabled.")
     end
 end
 
@@ -404,7 +404,7 @@ function KT:SetImmediateFilter(filter)
         error("KillTrack.SetImmediateFilter: Argument #1 (filter) must be of type 'string'")
     end
     self.Global.IMMEDIATE.FILTER = filter
-    KT:Msg("New immediate filter set to: " .. filter)
+    self:Msg("New immediate filter set to: " .. filter)
 end
 
 function KT:ClearImmediateFilter()
@@ -415,9 +415,9 @@ end
 function KT:ToggleCountMode()
     self.Global.COUNT_GROUP = not self.Global.COUNT_GROUP
     if self.Global.COUNT_GROUP then
-        KT:Msg("Now counting kills for every player in the group (party/raid)!")
+        self:Msg("Now counting kills for every player in the group (party/raid)!")
     else
-        KT:Msg("Now counting your own killing blows ONLY.")
+        self:Msg("Now counting your own killing blows ONLY.")
     end
 end
 
@@ -644,7 +644,7 @@ function KT:KillAlert(mob)
     }
     if C_AddOns.IsAddOnLoaded("Glamour") then
         if not _G["GlamourShowAlert"] then
-            KT:Msg("ERROR: GlamourShowAlert == nil! Notify AddOn developer.")
+            self:Msg("ERROR: GlamourShowAlert == nil! Notify AddOn developer.")
             return
         end
         _G.GlamourShowAlert(500, data)
@@ -733,13 +733,13 @@ end
 
 function KT:Purge(threshold)
     local count = 0
-    for k,v in pairs(KT.Global.MOBS) do
+    for k,v in pairs(self.Global.MOBS) do
         if type(v) == "table" and v.Kills < threshold then
             self.Global.MOBS[k] = nil
             count = count + 1
         end
     end
-    for k,v in pairs(KT.CharGlobal.MOBS) do
+    for k,v in pairs(self.CharGlobal.MOBS) do
         if type(v) == "table" and v.Kills < threshold then
             self.CharGlobal.MOBS[k] = nil
             count = count + 1
@@ -751,10 +751,10 @@ function KT:Purge(threshold)
 end
 
 function KT:Reset()
-    local count = #KT.Global.MOBS + #KT.CharGlobal.MOBS
+    local count = #self.Global.MOBS + #self.CharGlobal.MOBS
     wipe(self.Global.MOBS)
     wipe(self.CharGlobal.MOBS)
-    KT:Msg(("%d mob entries have been removed!"):format(count))
+    self:Msg(("%d mob entries have been removed!"):format(count))
     StaticPopup_Show("KILLTRACK_FINISH", tostring(count))
 end
 
