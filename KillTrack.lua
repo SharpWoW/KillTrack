@@ -109,6 +109,51 @@ if KT.Version == "@" .. "project-version" .. "@" then
     KT.Debug = true
 end
 
+if not UnitTokenFromGUID then
+    local units = {
+        "player",
+        "vehicle",
+        "pet",
+        "party1", "party2", "party3", "party4",
+        "partypet1", "partypet2", "partypet3", "partypet4"
+    }
+    -- Multiple loops to get the same ordering as mainline API
+    for i = 1, 40 do
+        units[#units + 1] = "raid" .. i
+    end
+    for i = 1, 40 do
+        units[#units + 1] = "raidpet" .. i
+    end
+    for i = 1, 40 do
+        units[#units + 1] = "nameplate" .. i
+    end
+    for i = 1, 5 do
+        units[#units + 1] = "arena" .. i
+    end
+    for i = 1, 5 do
+        units[#units + 1] = "arenapet" .. i
+    end
+    for i = 1, 8 do
+        units[#units + 1] = "boss" .. i
+    end
+    units[#units + 1] = "target"
+    units[#units + 1] = "focus"
+    units[#units + 1] = "npc"
+    units[#units + 1] = "mouseover"
+    units[#units + 1] = "softenemy"
+    units[#units + 1] = "softfriend"
+    units[#units + 1] = "softinteract"
+
+    UnitTokenFromGUID = function(guid)
+        for _, unit in ipairs(units) do
+            if UnitGUID(unit) == guid then
+                return unit
+            end
+        end
+        return nil
+    end
+end
+
 function KT:OnEvent(_, event, ...)
     if self.Events[event] then
         self.Events[event](self, ...)
