@@ -17,14 +17,17 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
+
 local KTT = KT.Tools
 
-KT.Options = {
+---@class KillTrackOptions
+local Opt = {
     Panel = CreateFrame("Frame")
 }
 
-local Opt = KT.Options
+KT.Options = Opt
 
 local panel = Opt.Panel
 
@@ -38,6 +41,10 @@ Opt.Category = category
 -- Dirty hack to give a name to option checkboxes
 local checkCounter = 0
 
+---@param label string
+---@param description string
+---@param onclick function
+---@return table|CheckButton
 local function checkbox(label, description, onclick)
     local check = CreateFrame(
         "CheckButton",
@@ -60,6 +67,10 @@ local function checkbox(label, description, onclick)
     return check
 end
 
+---@param text string
+---@param tooltip string
+---@param onclick function
+---@return table|Button
 local function button(text, tooltip, onclick)
     local btn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     btn:SetText(text)
@@ -79,14 +90,15 @@ function Opt:Open()
     Settings.OpenToCategory(self.Category.ID)
 end
 
-function Opt:Show()
+---@param self Frame
+function Opt.Show(self)
     local title = self:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     title:SetPoint("TOPLEFT", 16, -16)
     title:SetText("KillTrack")
 
     local printKills = checkbox("Print kill updates to chat",
         "With this enabled, every kill you make is going to be announced locally in the chatbox",
-        function(_, checked) KT.Global.PRINT = checked end)
+        function(_, checked) KT.Global.PRINTKILLS = checked end)
     printKills:SetPoint("TOPLEFT", title, "BOTTOMLEFT", -2, -16)
 
     local tooltipControl = checkbox("Show mob data in tooltip",
@@ -196,7 +208,7 @@ function Opt:Show()
     local datetimeFormatPreviewValue = self:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     datetimeFormatPreviewValue:SetPoint("LEFT", datetimeFormatPreview, "RIGHT", 8, 0)
     datetimeFormatPreviewValue:SetTextColor(1, 1, 1)
-    datetimeFormatPreviewValue:SetText(KTT:FormatDateTime())
+    datetimeFormatPreviewValue:SetText(KTT:FormatDateTime() --[[@as string]])
 
     datetimeFormat:SetScript("OnEditFocusGained", function(box)
         box:SetTextColor(0, 1, 0)
@@ -230,7 +242,7 @@ function Opt:Show()
         if type(value) ~= "string" then return end
         local valid, result = pcall(KTT.FormatDateTime, KTT, nil, value)
         if valid then
-            datetimeFormatPreviewValue:SetText(result)
+            datetimeFormatPreviewValue:SetText(result --[[@as string]])
         else
             datetimeFormatPreviewValue:SetText("invalid format")
         end
@@ -243,7 +255,7 @@ function Opt:Show()
     datetimeFormatReset:SetPoint("LEFT", datetimeFormat, "RIGHT", 5, 0)
 
     local function init()
-        printKills:SetChecked(KT.Global.PRINT)
+        printKills:SetChecked(KT.Global.PRINTKILLS)
         tooltipControl:SetChecked(KT.Global.TOOLTIP)
         printNew:SetChecked(KT.Global.PRINTNEW)
         countGroup:SetChecked(KT.Global.COUNT_GROUP)

@@ -17,17 +17,19 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.Broker = {
+---@class KillTrackBroker
+local KTB = {
     Text = {
         Short = "KPM: %.2f",
         Long = "Kills Per Minute: %.2f"
     }
 }
 
+KT.Broker = KTB
 local KTT = KT.Tools
-local KTB = KT.Broker
 
 local UPDATE = 1
 local t = 0
@@ -62,9 +64,10 @@ local clickFunctions = {
     }
 }
 
-local obj = ldb:NewDataObject("Broker_KillTrack", data)
+local obj = ldb:NewDataObject("Broker_KillTrack", data) --[[@as LibDataBroker.DataDisplay]]
 
-function obj:OnTooltipShow()
+---@param self GameTooltip
+function obj.OnTooltipShow(self)
     self:AddLine(("%s |cff00FF00(%s)|r"):format(KT.Name, KT.Version), 1, 1, 1)
     self:AddLine(" ")
     local _, kpm, kph, length = KT:GetSessionStats()
@@ -110,7 +113,7 @@ function obj:OnClick(button)
 end
 
 function obj:OnEnter()
-    GameTooltip:SetOwner(self, "ANCHOR_NONE")
+    GameTooltip:SetOwner(self --[[@as Frame]], "ANCHOR_NONE")
     GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
     KTB:UpdateTooltip()
     tooltipVisible = true
@@ -132,6 +135,8 @@ function KTB:UpdateTooltip()
     GameTooltip:Show()
 end
 
+---@param _ Frame
+---@param elapsed number
 function KTB:OnUpdate(_, elapsed)
     t = t + elapsed
     if t >= UPDATE then
@@ -155,6 +160,7 @@ function KTB:OnLoad()
     self:UpdateText()
 end
 
+---@param enabled boolean
 function KTB:SetMinimap(enabled)
     KT.Global.BROKER.MINIMAP.hide = not enabled
     if enabled then

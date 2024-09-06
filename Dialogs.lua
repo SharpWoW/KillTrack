@@ -17,7 +17,8 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
 StaticPopupDialogs.KILLTRACK_FINISH = {
     text = "%s entries removed.",
@@ -47,7 +48,7 @@ StaticPopupDialogs.KILLTRACK_PURGE = {
     button2 = "Cancel",
     hasEditBox = true,
     OnAccept = function(self)
-        KT:Purge(tonumber(self.editBox:GetText())) KT.MobList:UpdateMobs() KT.MobList:UpdateEntries()
+        KT:Purge(tonumber(self.editBox:GetText()) --[[@as integer]]) KT.MobList:UpdateMobs() KT.MobList:UpdateEntries()
     end,
     OnCancel = function() KT.Temp.Threshold = nil end,
     OnShow = function(self)
@@ -83,14 +84,17 @@ StaticPopupDialogs.KILLTRACK_RESET = {
     hideOnEscape = true
 }
 
+---@param id integer|string
+---@param name string
 function KT:ShowDelete(id, name)
-    id = tonumber(id)
+    id = tonumber(id) --[[@as integer]]
     name = tostring(name)
     if not id then error("'id' must be a number.") end
     self.Temp.DeleteId = id
     StaticPopup_Show("KILLTRACK_DELETE", name, id)
 end
 
+---@param threshold integer?
 function KT:ShowPurge(threshold)
     if tonumber(threshold) then
         self.Temp.Threshold = tonumber(threshold)

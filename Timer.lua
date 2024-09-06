@@ -17,14 +17,17 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.Timer = {
+---@class KillTrackTimer
+local T = {
     Time = {
         Start = 0,
         Stop = 0
     },
     Running = false,
+    ---@enum KillTrackTimerState
     State = {
         START = 0,
         UPDATE = 1,
@@ -32,11 +35,23 @@ KT.Timer = {
     }
 }
 
-local T = KT.Timer
+KT.Timer = T
 
 local KTT = KT.Tools
 
+---@class KillTrackTimerData
+---@field Last integer
+---@field Current integer
+---@field Start integer
+---@field Stop integer
+---@field Total integer
+---@field Left integer
+---@field LeftFormat string
+---@field Progress number
+---@field __DATA__ { [any]: any }
 local TimerData = {}
+
+---@alias KillTrackTimerCallback fun(data: KillTrackTimerData, state: KillTrackTimerState)
 
 T.Frame = CreateFrame("Frame")
 
@@ -55,10 +70,14 @@ local function TimeCheck(_, _)
     if now >= T.Time.Stop then T:Stop() end
 end
 
+---@return KillTrackTimerData
 function T:GetAllData()
     return KTT:TableCopy(TimerData)
 end
 
+---@param key any
+---@param failsafe boolean
+---@return any
 function T:GetData(key, failsafe)
     local r
     if failsafe then r = 0 end
@@ -66,17 +85,26 @@ function T:GetData(key, failsafe)
     return TimerData.__DATA__[key] or r
 end
 
+---@param key any
+---@param value any
 function T:SetData(key, value)
     if type(TimerData.__DATA__) ~= "table" then TimerData.__DATA__ = {} end
     TimerData.__DATA__[key] = value
 end
 
+---@return boolean
 function T:IsRunning()
     return self.Running
 end
 
+---@param seconds integer?
+---@param minutes integer?
+---@param hours integer?
+---@param callback KillTrackTimerCallback?
+---@param data { [any]: any }?
+---@return boolean
 function T:Start(seconds, minutes, hours, callback, data)
-    if self.Running then return end
+    if self.Running then return false end
     self.Running = true
     self:Reset()
     seconds = tonumber(seconds) or 0
@@ -118,15 +146,19 @@ function T:Reset()
     self.Time.Stop = 0
 end
 
+---@return KillTrackTimerCallback
 function T:GetCallback()
     return self.Callback
 end
 
+---@param func KillTrackTimerCallback
 function T:SetCallback(func)
     if type(func) ~= "function" then error("Argument 'func' must be of type 'function'.") end
     self.Callback = func
 end
 
+---@param data KillTrackTimerData
+---@param state KillTrackTimerState
 function T:RunCallback(data, state)
     if type(data) ~= "table" then error("Argument 'data' must be of type 'table'.") end
     local callback = self:GetCallback()

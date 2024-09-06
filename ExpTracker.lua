@@ -17,9 +17,12 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.ExpTracker = {
+---@class KillTrackExpTracker
+local ET = {
+    ---@type string[]
     Strings = {
         ---@diagnostic disable: undefined-field
         _G.COMBATLOG_XPGAIN_EXHAUSTION1,       -- %s dies, you gain %d experience. (%s exp %s bonus)
@@ -41,7 +44,7 @@ KT.ExpTracker = {
     }
 }
 
-local ET = KT.ExpTracker
+KT.ExpTracker = ET
 
 local initialized = false
 
@@ -52,6 +55,7 @@ local function Initialize()
     initialized = true
 end
 
+---@param message string
 function ET:CheckMessage(message)
     if not initialized then Initialize() end
     local name, exp

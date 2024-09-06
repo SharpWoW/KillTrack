@@ -17,13 +17,16 @@
     * along with KillTrack. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.TimerFrame = {
+---@class KillTrackTimerFrame
+local TF = {
     Running = false
 }
 
-local TF = KT.TimerFrame
+KT.TimerFrame = TF
+
 local T = KT.Timer
 
 local function Enabled(object, enabled)
@@ -133,7 +136,7 @@ local function SetupFrame()
 
     ---@diagnostic disable-next-line: inject-field
     frame.progressBar = CreateFrame("StatusBar", nil, frame)
-    frame.progressBar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]], "ARTWORK")
+    frame.progressBar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
     frame.progressBar:SetStatusBarColor(0, 1, 0)
     frame.progressBar:SetMinMaxValues(0, 1)
     frame.progressBar:SetValue(0)

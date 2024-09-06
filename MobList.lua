@@ -19,14 +19,17 @@
 
 -- Beware of some possibly messy code in this file
 
-local _, KT = ...
+---@class KillTrack
+local KT = select(2, ...)
 
-KT.MobList = {}
+---@class KillTrackMobList
+local ML = {}
 
-local ML = KT.MobList
+KT.MobList = ML
 local KTT = KT.Tools
 
 local Sort = KT.Sort.Desc
+---@type { Id: integer, Name: string, gKills: integer, cKills: integer }[]
 local Mobs = nil
 local LastFilter = nil
 local LastOffset = 0
@@ -47,11 +50,14 @@ local GLOBAL_WIDTH = 100
 local SCROLL_WIDTH = 27 -- Scrollbar width
 local STATUS_TEXT = "Showing entries %d through %d out of %d total (%d hidden)"
 
+---@type table|BackdropTemplate|Frame
 local frame = nil
 local created = false
 
 -- Frame helper functions
 
+---@param parent table|Frame
+---@return Button
 local function CreateHeader(parent)
     local h = CreateFrame("Button", nil, parent)
     h:SetHeight(HEADER_HEIGHT)
@@ -86,6 +92,9 @@ local function CreateHeader(parent)
     return h
 end
 
+---@param container table|Frame
+---@param previous table|Frame
+---@return Button
 local function CreateRow(container, previous)
     local row = CreateFrame("Button", nil, container)
     row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
@@ -394,6 +403,8 @@ function ML:Create()
     created = true
 end
 
+---@param sort KillTrackMobSortMode?
+---@param filter string?
 function ML:UpdateMobs(sort, filter)
     sort = (sort or Sort) or KT.Sort.Desc
     Sort = sort
@@ -402,6 +413,7 @@ function ML:UpdateMobs(sort, filter)
     FauxScrollFrame_Update(frame.rows.scroller, #Mobs, ROW_COUNT, ROW_HEIGHT)
 end
 
+---@param offset integer?
 function ML:UpdateEntries(offset)
     if (#Mobs <= 0) then
         for i = 1, ROW_COUNT do
