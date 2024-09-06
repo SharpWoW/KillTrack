@@ -278,7 +278,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     local _, event, _, s_guid, _, _, _, d_guid, d_name, _, _ = CombatLogGetCurrentEventInfo()
     if combat_log_damage_events[event] then
         if FirstDamage[d_guid] == nil then
-            -- s_name is (probably) the player who first damaged this mob and probably has the tag
+            -- s_guid is (probably) the player who first damaged this mob and probably has the tag
             FirstDamage[d_guid] = s_guid
         end
 
@@ -313,8 +313,7 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     local lastByPlayer = lastDamage == self.PlayerGUID or lastDamage == UnitGUID("pet")
     local pass
 
-    -- All checks after DamageValid should be safe to remove
-    -- The checks after DamageValid are also not 100% failsafe
+    -- The checks after DamageValid are not 100% failsafe
     -- Scenario: You deal the killing blow to an already tapped mob <- Would count as kill with current code
 
     -- if DamageValid[guid] is set, it can be used to decide if the kill was valid with 100% certainty
