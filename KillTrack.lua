@@ -123,6 +123,12 @@ local FirstDamage = {} -- Tracks first damage to a mob registered by CLEU
 local LastDamage = {} -- Tracks whoever did the most recent damage to a mob
 
 ---@type { [string]: boolean? }
+local HasPlayerDamage = {} -- Tracks whether the player (or pet) has dealt damage to a mob
+
+---@type { [string]: boolean? }
+local HasGroupDamage = {} -- Tracks whether a group member has dealt damage to a mob
+
+---@type { [string]: boolean? }
 local DamageValid = {} -- Determines if mob is tapped by player/group
 
 local combat_log_damage_events = {}
@@ -284,6 +290,12 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
 
         LastDamage[d_guid] = s_guid
 
+        if s_guid == self.PlayerGUID or s_guid == UnitGUID("pet") then
+            HasPlayerDamage[d_guid] = true
+        elseif self:IsInGroup(s_guid) then
+            HasGroupDamage[d_guid] = true
+        end
+
         if not DamageValid[d_guid] then
             -- if DamageValid returns true for a GUID, we can tell with 100% certainty that it's valid
             -- But this relies on one of the valid unit names currently being the damaged mob
@@ -305,32 +317,41 @@ function KT.Events.COMBAT_LOG_EVENT_UNFILTERED(self)
     local firstDamage = FirstDamage[d_guid]
     local lastDamage = LastDamage[d_guid]
     local damageValid = DamageValid[d_guid]
+    local hasPlayerDamage = HasPlayerDamage[d_guid]
+    local hasGroupDamage = HasGroupDamage[d_guid]
     FirstDamage[d_guid] = nil
     LastDamage[d_guid] = nil
     DamageValid[d_guid] = nil
-    local firstByPlayer = firstDamage == self.PlayerGUID or firstDamage == UnitGUID("pet")
-    local firstByGroup = self:IsInGroup(firstDamage)
-    local lastByPlayer = lastDamage == self.PlayerGUID or lastDamage == UnitGUID("pet")
-    local pass
+    HasPlayerDamage[d_guid] = nil
+    HasGroupDamage[d_guid] = nil
 
-    -- The checks after DamageValid are not 100% failsafe
+    -- If we can't identify the mob there's no point continuing
+    if d_id == nil or d_id == 0 then return end
+
+    local petGUID = UnitGUID("pet")
+    local firstByPlayer = firstDamage == self.PlayerGUID or firstDamage == petGUID
+    local firstByGroup = self:IsInGroup(firstDamage)
+    local lastByPlayer = lastDamage == self.PlayerGUID or lastDamage == petGUID
+
+    -- The checks when DamageValid is non-false are not 100% failsafe
     -- Scenario: You deal the killing blow to an already tapped mob <- Would count as kill with current code
 
-    -- if DamageValid[guid] is set, it can be used to decide if the kill was valid with 100% certainty
-    if damageValid ~= nil then
-        pass = damageValid
-    else
-        -- The one who dealt the very first bit of damage was probably the one who got the tag on the mob
-        -- This should apply in most (if not all) situations and is probably a safe fallback when we couldn't
-        -- retrieve tapped status from GUID->Unit
-        pass = firstByPlayer or firstByGroup
+    -- If damageValid is false, it means tap is denied on the mob and there is no way the kill would count
+    if damageValid == false then return end
+
+    -- If neither the player not group was involved in the battle, we don't count the kill
+    if not hasPlayerDamage and not hasGroupDamage then return end
+
+    if damageValid == nil and not firstByPlayer and not firstByGroup then
+        -- If we couldn't get a proper tapped status and the first recorded damage was not by player or group,
+        -- we can't be sure the kill was valid, so ignore it
+        return
     end
 
-    if not self.Global.COUNT_GROUP and pass and not lastByPlayer then
-        pass = false -- Player or player's pet did not deal the killing blow and addon only tracks player kills
+    if not lastByPlayer and not self.Global.COUNT_GROUP then
+        return -- Player or player's pet did not deal the killing blow and addon only tracks player kills
     end
 
-    if not pass or d_id == nil or d_id == 0 then return end
     self:AddKill(d_id, d_name)
     if self.Timer:IsRunning() then
         self.Timer:SetData("Kills", self.Timer:GetData("Kills", true) + 1)
@@ -420,12 +441,12 @@ function KT:ToggleDebug()
     end
 end
 
----@param unit string?
+---@param guid string?
 ---@return boolean
-function KT:IsInGroup(unit)
-    if not unit or unit == "" then return false end
-    if unit == self.PlayerName or unit == self.PlayerGUID then return true end
-    return IsGUIDInGroup(unit)
+function KT:IsInGroup(guid)
+    if not guid or guid == "" then return false end
+    if guid == self.PlayerName or guid == self.PlayerGUID then return true end
+    return IsGUIDInGroup(guid)
 end
 
 ---@param threshold integer
