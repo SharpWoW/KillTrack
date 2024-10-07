@@ -113,6 +113,7 @@ function obj:OnClick(button)
 end
 
 function obj:OnEnter()
+    KT:DebugMsg("Broker OnEnter")
     GameTooltip:SetOwner(self --[[@as Frame]], "ANCHOR_NONE")
     GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
     KTB:UpdateTooltip()
@@ -120,6 +121,7 @@ function obj:OnEnter()
 end
 
 function obj:OnLeave()
+    KT:DebugMsg("Broker OnLeave")
     tooltipVisible = false
     GameTooltip:Hide()
 end
@@ -130,6 +132,7 @@ function KTB:UpdateText()
 end
 
 function KTB:UpdateTooltip()
+    KT:DebugMsg("Broker UpdateTooltip")
     GameTooltip:ClearLines()
     obj.OnTooltipShow(GameTooltip)
     GameTooltip:Show()
