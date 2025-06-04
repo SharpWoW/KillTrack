@@ -30,3 +30,4 @@ jobs:
         with:
           name: addon-zips
           path: '.release/KillTrack-*.zip'
+          include-hidden-files: true
